@@ -1,0 +1,56 @@
+{% extends 'shared/_layout.html' %}
+{% load thumbnail %}
+{% load render_partial %}
+{% load jalali_tags %}
+
+{% block title %}لیست پرونده ها{% endblock %}
+
+{% block content %}
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-9 padding-right">
+                {% if categorized_movakels %}
+                    {% for year, movakels in categorized_movakels.items %}
+                        <h2 class="title">پرونده‌های سال {{ year }}</h2>
+                        <div class="features_items row">
+                            {% for movakel in movakels %}
+                                {% include 'movakel_module/includes/movakel_item_partial.html' with movakel=movakel col_size=4 %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa fa-folder-open"></i>
+                        <p>هیچ پرونده‌ای یافت نشد</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-sm-3">
+                <div class="left-sidebar">
+                    <h2>دسته‌بندی پرونده‌ها</h2>
+                    <ul class="category-list">
+                        {% for category in category_list %}
+                            <li>
+                                {{ category.name }}
+                                <span class="category-count">{{ category.count }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <form action="" method="get" id="filter_form">
+                        <input type="hidden" name="page" id="page" value="{{ page_obj.number }}">
+                        <input type="hidden" name="start_total_amount" id="start_total_amount" value="{{ start_total_amount }}">
+                        <input type="hidden" name="end_total_amount" id="end_total_amount" value="{{ end_total_amount }}">
+                    </form>
+                    <button class="btn btn-primary btn-block" onclick="filterMovakels()" style="margin-top:14px;">
+                        <i class="fa fa-filter"></i> فیلتر
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+<div class="types_movakels">
+    <h2>نوع پرونده ها</h2>
+    <div class="types-name">
+        <ul class="nav nav-pills nav-stacked">
+            {% for type in types %}
+                <li><a href="{% url 'movakel-categories-list' cat=type.url_title %}"> <span
+                        class="pull-left">({{ type.movakels_count }})</span>{{ type.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

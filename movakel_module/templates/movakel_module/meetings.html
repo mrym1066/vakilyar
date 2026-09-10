@@ -1,0 +1,98 @@
+{% extends 'shared/_layout.html' %}
+{% block title %}لیست ملاقات‌ها{% endblock %}
+{% load humanize %}
+
+{% block content %}
+<section>
+    <div class="container">
+
+        <div class="row" style="align-items:center; margin-bottom:8px;">
+            <div class="col-sm-6">
+                <h2 class="title">لیست ملاقات‌ها</h2>
+            </div>
+            <div class="col-sm-6 text-left no-print">
+                <a href="{% url 'request_meeting' %}" class="btn btn-success">
+                    <i class="fa fa-plus"></i> ثبت ملاقات جدید
+                </a>
+            </div>
+        </div>
+
+        <div class="movakel-details" style="padding:0; overflow:hidden;">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ردیف</th>
+                            <th>نام</th>
+                            <th>شماره ملی</th>
+                            <th>نوع ملاقات</th>
+                            <th>موضوع ملاقات</th>
+                            <th>تاریخ</th>
+                            <th>مدت جلسه</th>
+                            <th>هزینه</th>
+                            <th>پرینت</th>
+                            <th>وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for meeting in meetings %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><strong>{{ meeting.full_name }}</strong></td>
+                                <td>{{ meeting.national_id }}</td>
+                                <td>{{ meeting.get_meeting_type_display }}</td>
+                                <td>
+                                    {% if meeting.meeting_subject.all.count > 0 %}
+                                        {% for subject in meeting.meeting_subject.all %}
+                                            <span class="badge badge-info">{{ subject.name }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">موضوعی انتخاب نشده است</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if meeting.meeting_date %}
+                                        {{ meeting.meeting_date|date:"Y/m/d H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">زمان تعیین نشده</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if meeting.duration %}
+                                        {{ meeting.duration }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ meeting.meeting_fee|default:"-"|intcomma }} تومان</td>
+                                <td class="no-print">
+                                    <a href="{% url 'meeting_pdf' meeting.id %}" target="_blank" class="btn btn-sm btn-primary">
+                                        <i class="fa fa-file-pdf-o"></i> PDF
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if meeting.related_movakel %}
+                                        <span class="badge badge-success">✅ وکالت</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">⏳ مشاوره</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="10">
+                                    <div class="empty-state">
+                                        <i class="fa fa-calendar-o"></i>
+                                        <p>هیچ ملاقاتی ثبت نشده است.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

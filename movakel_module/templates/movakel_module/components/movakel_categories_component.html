@@ -1,0 +1,14 @@
+<h2>دسته‌بندی پرونده‌ها</h2>
+<div class="panel-group category-movakels" id="accordian"><!--category-movakels-->
+    {% for category in category_list %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a href="{% url 'movakel-categories-list' cat=category.name %}">
+                        {{ category.name }} ({{ category.count }})
+                    </a>
+                </h4>
+            </div>
+        </div>
+    {% endfor %}
+</div><!--/category-movakels-->

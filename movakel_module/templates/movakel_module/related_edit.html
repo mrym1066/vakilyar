@@ -1,0 +1,118 @@
+{% extends 'shared/_layout.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block header_references %}
+<style>
+    .related-edit-page {
+        max-width: 1050px;
+        margin: 35px auto 60px;
+        padding: 0 15px;
+        direction: rtl;
+    }
+    .related-edit-card {
+        background: #fff;
+        border: 1px solid #e7e7e7;
+        border-radius: 14px;
+        box-shadow: 0 8px 28px rgba(0,0,0,.07);
+        overflow: hidden;
+    }
+    .related-edit-header {
+        padding: 24px 28px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .related-edit-header h2 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        font-weight: 700;
+    }
+    .related-edit-header p {
+        margin: 0;
+        color: #777;
+    }
+    .related-edit-body { padding: 28px; }
+    .edit-field { margin-bottom: 20px; }
+    .edit-field label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #333;
+    }
+    .edit-field input:not([type="checkbox"]),
+    .edit-field select,
+    .edit-field textarea {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid #d9dee3;
+        border-radius: 8px;
+        padding: 9px 12px;
+        background: #fff;
+        box-sizing: border-box;
+    }
+    .edit-field textarea { min-height: 110px; resize: vertical; }
+    .edit-field input[type="checkbox"] { width: 20px; height: 20px; }
+    .field-help { display: block; margin-top: 5px; color: #888; font-size: 12px; }
+    .field-error { color: #b42318; font-size: 13px; margin-top: 5px; }
+    .edit-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+    .edit-actions .btn { min-width: 130px; border-radius: 8px; }
+    .form-check-row { display: flex; align-items: center; gap: 9px; }
+    .form-check-row label { margin: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="related-edit-page">
+    <div class="related-edit-card">
+        <div class="related-edit-header">
+            <h2>✏️ {{ title }}</h2>
+            {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+        </div>
+
+        <div class="related-edit-body">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="row">
+                    {% for field in form %}
+                        <div class="col-sm-6 edit-field {% if field.name == 'description' or field.name == 'final_result' or field.name == 'primary_court_result' or field.name == 'appeal_court_result' or field.name == 'executive_court_result' or field.name == 'address' %}col-sm-12{% endif %}">
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                                <div class="form-check-row">
+                                    {{ field }}
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                            {% endif %}
+
+                            {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
+                            {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="edit-actions">
+                    <button type="submit" class="btn btn-primary">💾 ذخیره تغییرات</button>
+                    {% if back_url %}
+                        <a href="{{ back_url }}" class="btn btn-default">انصراف</a>
+                    {% else %}
+                        <button type="button" class="btn btn-default" onclick="history.back()">انصراف</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

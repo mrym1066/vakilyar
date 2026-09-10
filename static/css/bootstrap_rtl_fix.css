@@ -1,0 +1,93 @@
+/* =====================================================
+   وکیل‌یار — اصلاح کامل RTL برای گرید Bootstrap 3
+   این فایل را بلافاصله بعد از bootstrap.min.css
+   و قبل از main.css / custom.css لینک کنید.
+   بدون این فایل، ستون‌ها (col-sm-*) هنوز چپ‌به‌راست
+   فلوت می‌شن و در سایزهای میانی روی هم می‌افتن.
+   ===================================================== */
+
+/* ── جهت پایه ── */
+html { direction: rtl; }
+
+/* ── فلوت اصلی گرید: همه‌ی ستون‌ها راست‌به‌چپ ── */
+.row { direction: rtl; }
+[class*="col-"] {
+    float: right !important;
+}
+
+/* ── ترتیب صحیح container/row (بدون تغییر منطق عرض‌ها) ── */
+.container,
+.container-fluid {
+    direction: rtl;
+}
+
+/* ── آفست‌ها: در RTL باید از سمت راست فاصله بگیرن نه چپ ── */
+[class*="col-sm-offset-"],
+[class*="col-md-offset-"],
+[class*="col-lg-offset-"],
+[class*="col-xs-offset-"] {
+    margin-left: 0 !important;
+}
+.col-sm-offset-1  { margin-right: 8.33333333%  !important; }
+.col-sm-offset-2  { margin-right: 16.66666667% !important; }
+.col-sm-offset-3  { margin-right: 25%          !important; }
+.col-sm-offset-4  { margin-right: 33.33333333% !important; }
+.col-sm-offset-5  { margin-right: 41.66666667% !important; }
+.col-sm-offset-6  { margin-right: 50%          !important; }
+.col-sm-offset-7  { margin-right: 58.33333333% !important; }
+.col-sm-offset-8  { margin-right: 66.66666667% !important; }
+.col-sm-offset-9  { margin-right: 75%          !important; }
+.col-sm-offset-10 { margin-right: 83.33333333% !important; }
+.col-sm-offset-11 { margin-right: 91.66666667% !important; }
+.col-md-offset-1  { margin-right: 8.33333333%  !important; }
+.col-md-offset-2  { margin-right: 16.66666667% !important; }
+.col-md-offset-3  { margin-right: 25%          !important; }
+.col-md-offset-4  { margin-right: 33.33333333% !important; }
+.col-md-offset-6  { margin-right: 50%          !important; }
+
+/* ── pull / push کلاسیک بوت‌استرپ ── */
+.pull-right { float: right !important; }
+.pull-left  { float: left  !important; }
+
+/* ── nav / navbar: آیتم‌ها هم باید راست‌به‌چپ بچینن ── */
+.nav > li { float: right; }
+.navbar-nav > li { float: right; }
+.navbar-header { float: right; }
+.navbar-toggle { float: left; margin-left: 0; margin-right: 15px; }
+
+/* ── dropdown menu: باز شدن از سمت راست ── */
+.dropdown-menu {
+    right: 0;
+    left: auto;
+    text-align: right;
+}
+
+/* ── breadcrumb / pagination فلش‌ها ── */
+.pagination { direction: rtl; }
+
+/* ── فرم‌های inline ── */
+.form-inline .form-control { margin-left: 0; margin-right: 0; }
+
+/* ── مودال بوت‌استرپ ── */
+.modal-header .close { float: left; }
+
+/* ══════════════════════════════════
+   ثبات گرید در سایزهای میانی (تبلت)
+   جلوگیری از روی‌هم‌افتادن ستون‌ها
+   ══════════════════════════════════ */
+@media (min-width: 768px) and (max-width: 991px) {
+    .container { width: 750px; }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+    .container { width: 970px; }
+}
+@media (min-width: 1200px) {
+    .container { width: 1170px; }
+}
+/* زیر ۷۶۸px: تک‌ستونه — این خط جلوی هم‌پوشانی رو در حالت گذار می‌گیره */
+@media (max-width: 767px) {
+    [class*="col-"] {
+        float: none !important;
+        width: 100% !important;
+    }
+}

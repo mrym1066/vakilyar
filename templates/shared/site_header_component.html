@@ -1,0 +1,91 @@
+<header id="header"><!--header-->
+
+    <div class="header-middle"><!--header-middle-->
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="logo">
+                        <a href="{% url 'movakel-list' %}">
+                            {% if site_setting and site_setting.site_logo %}
+                                <img src="{{ site_setting.site_logo.url }}" alt="وکیل‌یار" style="max-height:56px;">
+                            {% else %}
+                                <span class="logo-text"><i class="fa fa-balance-scale"></i> وکیل‌یار</span>
+                                <span class="logo-subtitle">سامانه مدیریت پرونده‌های وکالت</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="header-user-box pull-left no-print">
+                        {% if request.user.is_authenticated %}
+                            <div class="user-chip dropdown">
+                                <a href="#" class="user-chip-toggle" data-toggle="dropdown">
+                                    <span class="user-avatar">{{ request.user.get_full_name|default:request.user.username|slice:":1" }}</span>
+                                    <span class="user-text">
+                                        <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                                        <span class="user-role">{% if request.user.is_superuser %}مدیر سیستم{% else %}کارمند دفتر{% endif %}</span>
+                                    </span>
+                                    <i class="fa fa-angle-down"></i>
+                                </a>
+                                <ul class="dropdown-menu user-dropdown-menu">
+                                    {% if request.user.is_superuser %}
+                                        <li><a href="/admin/"><i class="fa fa-cog"></i> مدیریت سیستم</a></li>
+                                    {% endif %}
+                                    <li><a href="{% url 'user_panel_dashboard' %}"><i class="fa fa-user"></i> پنل کاربری</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="{% url 'logout_page' %}"><i class="fa fa-sign-out"></i> خروج از حساب</a></li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'login_page' %}" class="btn btn-primary btn-sm"><i class="fa fa-sign-in"></i> ورود به سامانه</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!--/header-middle-->
+
+    <div class="header-bottom"><!--header-bottom-->
+        <div class="container">
+            <div class="row">
+
+                <div class="col-sm-3">
+                    <form class="search_box pull-left" action="{% url 'movakel-list' %}" method="get">
+                        <input type="text" name="q" placeholder="جستجوی پرونده یا موکل..." value="{{ request.GET.q }}"/>
+                    </form>
+                </div>
+
+                <div class="col-sm-9">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse"
+                                data-target=".navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <div class="mainmenu pull-right">
+                        <ul class="nav navbar-nav collapse navbar-collapse">
+
+                            <li>
+                                <a class="{% if request.resolver_match.url_name == 'meeting_list' %}active{% endif %}"
+                                   href="{% url 'meeting_list' %}"><i class="fa fa-calendar"></i> ملاقات‌ها</a>
+                            </li>
+                            <li>
+                                <a class="{% if request.resolver_match.url_name == 'movakel-list' %}active{% endif %}"
+                                   href="{% url 'movakel-list' %}"><i class="fa fa-folder-open"></i> پرونده‌ها</a>
+                            </li>
+                            <li>
+                                <a class="{% if request.resolver_match.url_name == 'articles_list' %}active{% endif %}"
+                                   href="{% url 'articles_list' %}"><i class="fa fa-file-text"></i> مقالات</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div><!--/header-bottom-->
+</header><!--/header-->

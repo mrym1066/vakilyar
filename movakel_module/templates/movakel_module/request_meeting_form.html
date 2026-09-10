@@ -1,0 +1,44 @@
+{% extends 'shared/_layout.html' %}
+{% load widget_tweaks %}
+
+{% block title %}ثبت درخواست ملاقات جدید{% endblock %}
+
+{% block content %}
+<section class="py-4" dir="rtl">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">📋 ثبت درخواست ملاقات جدید</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {{ message.tags }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">{{ field.label }}</label>
+                                    {{ field|add_class:"form-control" }}
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-1">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-success">💾 ثبت ملاقات</button>
+                                <a href="{% url 'meeting_list' %}" class="btn btn-secondary">انصراف</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

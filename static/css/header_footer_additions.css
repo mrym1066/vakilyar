@@ -1,0 +1,889 @@
+/* =====================================================
+   وکیل‌یار — استایل تکمیلی هدر/فوتر و صفحه جزئیات پرونده
+   ===================================================== */
+
+/* =====================================================
+   بازتعریف پالت رنگی
+   ===================================================== */
+:root {
+    --navy: #10305C;
+    --navy-mid: #1B4B8F;
+    --gold: #2F6FED;
+    --gold-light: #8FB6FF;
+}
+
+/* ── دکمه‌ها ── */
+.btn-primary {
+    background: var(--navy-mid) !important;
+    border-color: var(--navy-mid) !important;
+}
+.btn-primary:hover {
+    background: var(--navy) !important;
+    border-color: var(--navy) !important;
+}
+
+.btn-outline-navy {
+    background: #ffffff;
+    border: 1px solid var(--navy);
+    color: var(--navy);
+}
+.btn-outline-navy:hover,
+.btn-outline-navy:focus {
+    background: var(--navy);
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.badge-secondary {
+    background: #9aa0a6 !important;
+    color: #fff !important;
+}
+
+/* ── لوگو ── */
+.header-middle {
+    background: #ffffff;
+    border-bottom: 1px solid #e4e1d9;
+    padding: 18px 0;
+}
+.header-middle .logo a {
+    display: inline-flex;
+    flex-direction: column;
+}
+.header-middle .logo-text {
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.header-middle .logo-text i {
+    color: var(--gold);
+    font-size: 22px;
+}
+.header-middle .logo-subtitle {
+    font-size: 12px;
+    color: #9b9890;
+    margin-top: 2px;
+    margin-right: 30px;
+}
+
+/* ── چیپ کاربر ── */
+.header-user-box {
+    display: flex;
+    align-items: center;
+}
+.user-chip {
+    position: relative;
+}
+.user-chip-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px 8px 12px;
+    border-radius: 40px;
+    background: #f7f5f0;
+    border: 1px solid #e4e1d9;
+    box-shadow: 0 1px 4px rgba(27, 42, 74, 0.08);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.user-chip-toggle:hover {
+    background: #ffffff;
+    border-color: var(--navy-mid);
+    box-shadow: 0 4px 16px rgba(27, 42, 74, 0.12);
+}
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+    border: 2px solid var(--gold-light);
+}
+.user-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+.user-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2e2c28;
+}
+.user-role {
+    font-size: 11px;
+    color: #9b9890;
+}
+.user-chip-toggle > i.fa-angle-down {
+    font-size: 12px;
+    color: #9b9890;
+    margin-right: 2px;
+}
+
+.user-dropdown-menu {
+    right: 0;
+    left: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(27, 42, 74, 0.12);
+    border: 1px solid #e4e1d9;
+    padding: 6px;
+    margin-top: 8px;
+    min-width: 200px;
+}
+.user-dropdown-menu li a {
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #2e2c28;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.user-dropdown-menu li a:hover {
+    background: #f1eff9;
+    color: var(--navy);
+}
+.user-dropdown-menu li a i {
+    color: var(--gold);
+    width: 14px;
+    text-align: center;
+}
+.user-dropdown-menu li.divider {
+    margin: 4px 0;
+    border-top: 1px solid #e4e1d9;
+}
+
+/* ── ریسپانسیو هدر ── */
+@media (max-width: 991px) {
+    .header-user-box {
+        justify-content: center;
+        padding: 8px 0;
+    }
+    .header-middle .col-sm-6 {
+        width: 100% !important;
+        float: none !important;
+        text-align: center !important;
+    }
+    .header-middle .logo a {
+        align-items: center;
+    }
+    .header-middle .logo-subtitle {
+        margin-right: 0;
+    }
+}
+@media (max-width: 767px) {
+    .footer-bottom .col-sm-6 {
+        width: 100% !important;
+        float: none !important;
+        text-align: center !important;
+    }
+    .footer-bottom p.pull-right,
+    .footer-bottom p.pull-left {
+        float: none !important;
+        margin: 4px 0;
+    }
+}
+
+/* ── فوتر ── */
+.footer-note {
+    opacity: 0.65;
+    font-size: 12px;
+}
+
+/* ── آواتار پیش‌فرض ── */
+.movakel-avatar-fallback {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 auto 12px;
+    border: 3px solid #e4e1d9;
+}
+
+/* ── سایدبار ── */
+.category-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.category-count {
+    background: #f1eff9;
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 20px;
+}
+
+/* ── دکمه مشاهده جزئیات ── */
+.choose .nav-justified {
+    display: flex;
+}
+.choose .nav-justified > li {
+    display: block !important;
+    float: none !important;
+    width: 100% !important;
+}
+.choose .nav li a {
+    white-space: nowrap;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* ============================================================
+   صفحه جزئیات پرونده (movakel_detail)
+   ============================================================ */
+
+/* ── دکمه‌های ویرایش در جداول ── */
+.row-edit-btn {
+    white-space: nowrap;
+    min-width: 76px;
+    border-radius: 7px;
+}
+.table .row-edit-cell {
+    width: 95px;
+    text-align: center;
+    vertical-align: middle;
+}
+.section-edit-bar {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+/* ── جداول ── */
+.table thead th {
+    background: #1B2A4A;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 10px 12px;
+    text-align: center;
+    border: 1px solid #2c4a7a;
+    white-space: nowrap;
+}
+.table tbody td {
+    padding: 9px 12px;
+    vertical-align: middle;
+    border: 1px solid #e8e6e0;
+    text-align: center;
+}
+.table tbody tr:nth-of-type(even) {
+    background: #faf9f6;
+}
+.table tbody tr:hover {
+    background: #f0f4ff !important;
+}
+.table-responsive {
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(27, 42, 74, 0.08);
+    border: 1px solid #e4e1d9;
+}
+.table-responsive table {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+}
+table thead th:first-child {
+    border-top-right-radius: 10px;
+}
+table thead th:last-child {
+    border-top-left-radius: 10px;
+}
+table tbody td:first-child {
+    color: #2e2c28;
+    font-weight: 600;
+}
+table td,
+table th {
+    font-variant-numeric: tabular-nums;
+}
+table input[type="checkbox"] {
+    width: 19px;
+    height: 19px;
+    cursor: pointer;
+    accent-color: var(--navy);
+}
+table details summary {
+    cursor: pointer;
+    color: var(--navy);
+    font-weight: 600;
+    font-size: 13px;
+}
+table details summary:hover {
+    color: #2F6FED;
+}
+table details pre {
+    margin-top: 8px;
+    background: #f1eff9;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+table .badge {
+    font-size: 11px;
+    padding: 3px 9px;
+}
+table td .text-muted {
+    font-size: 12.5px;
+}
+
+/* ── وضعیت خالی ── */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: #faf9f6;
+    border-radius: 12px;
+    border: 2px dashed #d6d3cc;
+    margin: 20px 0;
+}
+.empty-state i {
+    display: block;
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 12px;
+}
+.empty-state p {
+    color: #9b9890;
+    font-size: 14px;
+}
+
+.badge-primary {
+    background: #1B2A4A;
+    color: #fff;
+}
+
+/* ── هدر پرونده ── */
+.movakel-details.case-header {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px 28px 18px;
+    box-shadow: 0 4px 24px rgba(27, 42, 74, 0.10);
+    border: 1px solid #e8e6e0;
+    margin-bottom: 24px;
+    transition: box-shadow 0.3s ease;
+}
+.movakel-details.case-header:hover {
+    box-shadow: 0 8px 40px rgba(27, 42, 74, 0.14);
+}
+
+.case-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0ede6;
+}
+
+.case-header-identity {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.case-avatar-fallback {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1B2A4A, #2c4a7a);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(27, 42, 74, 0.20);
+    border: 3px solid #f0ede6;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.case-avatar-fallback:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(27, 42, 74, 0.30);
+}
+.case-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #f0ede6;
+    box-shadow: 0 4px 12px rgba(27, 42, 74, 0.15);
+}
+
+.case-header-identity h1 {
+    margin: 0 0 2px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1B2A4A;
+}
+.case-header-identity .case-id {
+    margin: 0;
+    font-size: 13px;
+    color: #9b9890;
+}
+.case-header-identity .case-mobile {
+    margin: 2px 0 0 0;
+    font-size: 13px;
+    color: #5a5751;
+    font-weight: 500;
+}
+.case-header-identity .case-mobile i {
+    color: #c9a84c;
+    margin-left: 6px;
+    font-size: 14px;
+}
+
+/* ── دکمه‌های هدر (تراز شده) ── */
+.case-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.case-header-actions .btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    height: 38px;
+    white-space: nowrap;
+}
+.case-header-actions .btn i {
+    font-size: 13px;
+}
+.case-header-actions .btn-warning {
+    background: #f5a623;
+    color: #ffffff;
+}
+.case-header-actions .btn-warning:hover {
+    background: #d98e1a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(245, 166, 35, 0.40);
+    color: #fff;
+}
+.case-header-actions .btn-primary {
+    background: #1B2A4A;
+    color: #ffffff;
+    margin-top: 0;
+}
+.case-header-actions .btn-primary:hover {
+    background: #2c4a7a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(27, 42, 74, 0.35);
+    color: #fff;
+}
+.case-header-actions .btn-outline-navy {
+    background: #ffffff;
+    color: #1B2A4A;
+    border: 2px solid #1B2A4A;
+}
+.case-header-actions .btn-outline-navy:hover {
+    background: #1B2A4A;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(27, 42, 74, 0.30);
+}
+.case-header-actions .btn-default.disabled {
+    background: #e8e6e0;
+    color: #9b9890;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* ── نوار وضعیت ── */
+.case-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    margin-top: 16px;
+    padding: 14px 20px;
+    background: #f8f7f3;
+    border-radius: 12px;
+    border: 1px solid #e8e6e0;
+}
+.case-status-bar .status-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.case-status-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #2e2c28;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.case-status-bar .badge {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.case-status-bar .badge.badge-info {
+    background: #ddeeff;
+    color: #1a4a8a;
+}
+.case-status-bar .badge.badge-warning {
+    background: #fdf2de;
+    color: #7a4a0e;
+}
+.case-status-bar .badge.badge-danger {
+    background: #fde8e8;
+    color: #7a1a1a;
+}
+.case-status-bar .badge.badge-success {
+    background: #d4f0e2;
+    color: #0e5a2e;
+}
+.case-status-bar .badge.badge-secondary {
+    background: #e8e6e0;
+    color: #5a5751;
+}
+
+/* ── فرم تغییر وضعیت ── */
+.case-status-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.case-status-form .status-select {
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+    font-size: 13px;
+    padding: 7px 14px;
+    padding-left: 30px;
+    border-radius: 8px;
+    border: 1.5px solid #d6d3cc;
+    background: #ffffff;
+    color: #2e2c28;
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+    min-width: 150px;
+    height: 38px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B2A4A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: left 10px center;
+    background-size: 16px;
+}
+.case-status-form .status-select:focus {
+    border-color: #1B2A4A;
+    box-shadow: 0 0 0 4px rgba(27, 42, 74, 0.12);
+}
+.case-status-form .status-select:hover {
+    border-color: #1B2A4A;
+}
+.case-status-form .status-submit-btn {
+    background: #1B2A4A;
+    color: #ffffff;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 18px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    height: 38px;
+}
+.case-status-form .status-submit-btn:hover {
+    background: #2c4a7a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(27, 42, 74, 0.30);
+}
+.case-status-form .status-submit-btn i {
+    font-size: 13px;
+}
+
+/* ── عنوان بخش‌های داخل تب‌ها ── */
+.tab-content h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e4e1d9;
+}
+.tab-content h3:first-child {
+    margin-top: 4px;
+}
+/* ── اطلاعات هدر در یک خط ── */
+.case-header-identity .case-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.case-header-identity .case-header-info h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1B2A4A;
+}
+
+.case-header-identity .case-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.case-header-identity .case-meta .case-id,
+.case-header-identity .case-meta .case-mobile {
+    margin: 0;
+    font-size: 13px;
+    color: #5a5751;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.case-header-identity .case-meta .case-id i,
+.case-header-identity .case-meta .case-mobile i {
+    color: #c9a84c;
+    font-size: 13px;
+}
+
+.case-header-identity .case-meta .case-id {
+    color: #9b9890;
+}
+
+/* ============================================================
+   کارت پرونده - استایل‌های جدید
+   ============================================================ */
+
+/* ── دکمه مشاهده جزئیات (حالت عادی) ── */
+.choose .choose-link {
+    background: #1B2A4A !important;  /* صورمه‌ای/آبی تیره */
+    color: #ffffff !important;       /* متن سفید */
+    padding: 11px 0;
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 0 0 10px 10px;
+    text-decoration: none;
+}
+
+.choose .choose-link i {
+    margin-left: 5px;
+}
+
+.choose .choose-link:hover {
+    background: #f2f1f3 !important;  /* رنگ پس‌زمینه جدید */
+    color: #1B2A4A !important;       /* متن تیره */
+    text-decoration: none;
+}
+
+/* ── هاور روی کل کارت: مخفی کردن دکمه مشاهده جزئیات ── */
+.movakel-image-wrapper:hover .choose .choose-link {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* ── نمایش دکمه مشاهده پرونده در هاور ── */
+.movakel-image-wrapper:hover .movakel-overlay {
+    opacity: 0.95 !important;
+    height: 100% !important;
+}
+
+/* ── استایل دکمه داخل اورلی ── */
+.btn-overlay {
+    background: #f2f1f3 !important;  /* پس‌زمینه روشن */
+    color: #1B2A4A !important;       /* متن تیره */
+    border: none !important;
+    padding: 8px 20px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-overlay:hover {
+    background: #ffffff !important;
+    color: #1B2A4A !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(27, 42, 74, 0.25);
+}
+/* ============================================================
+   ریسپانسیو
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .movakel-details.case-header {
+        padding: 16px 14px 14px;
+        border-radius: 12px;
+    }
+    .case-header-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .case-header-identity {
+        gap: 14px;
+    }
+    .case-avatar-fallback,
+    .case-avatar {
+        width: 56px;
+        height: 56px;
+        font-size: 22px;
+    }
+    .case-header-identity h1 {
+        font-size: 18px;
+    }
+    .case-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .case-header-actions .btn {
+        font-size: 11px;
+        padding: 6px 14px;
+        height: 34px;
+    }
+    .case-status-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+    .case-status-bar .status-left {
+        justify-content: center;
+    }
+    .case-status-form {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .case-status-form .status-select {
+        flex: 1;
+        min-width: 130px;
+        font-size: 12px;
+        padding: 6px 12px;
+        padding-left: 28px;
+        height: 34px;
+    }
+    .case-status-form .status-submit-btn {
+        font-size: 11px;
+        padding: 6px 14px;
+        height: 34px;
+    }
+    .case-status-form {
+        border-right: none;
+        border-top: 1px solid #e4e1d9;
+        padding-right: 0;
+        padding-top: 12px;
+        width: 100%;
+    }
+    .case-status-form select {
+        flex: 1;
+    }
+    table thead th,
+    table tbody td {
+        padding: 9px 12px;
+        white-space: nowrap;
+    }
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 480px) {
+    .movakel-details.case-header {
+        padding: 12px 10px 10px;
+    }
+    .case-header-identity h1 {
+        font-size: 16px;
+    }
+    .case-avatar-fallback,
+    .case-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+    .case-header-identity .case-id,
+    .case-header-identity .case-mobile {
+        font-size: 11px;
+    }
+    .case-header-actions .btn {
+        font-size: 10px;
+        padding: 5px 10px;
+        height: 30px;
+    }
+    .case-header-actions .btn i {
+        font-size: 11px;
+    }
+    .case-status-bar .badge {
+        font-size: 11px;
+        padding: 4px 12px;
+    }
+    .case-status-form .status-select {
+        font-size: 11px;
+        padding: 5px 10px;
+        padding-left: 24px;
+        min-width: 100px;
+        height: 30px;
+    }
+    .case-status-form .status-submit-btn {
+        font-size: 10px;
+        padding: 5px 12px;
+        height: 30px;
+    }
+    .table thead th,
+    .table tbody td {
+        padding: 6px 8px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+    .row-edit-btn {
+        font-size: 10px;
+        padding: 3px 8px;
+        min-width: 60px;
+    }
+    .row-edit-cell {
+        width: 70px;
+    }
+}
+

@@ -1,0 +1,119 @@
+{% extends 'shared/_layout.html' %}
+{% load render_partial %}
+{% load poll_extras %}
+{% load jalali_tags %}
+{% load jalali_filters %}
+{% load humanize %}
+{% block title %}
+    {{ movakel.title }}
+{% endblock %}
+
+{% block header_references %}
+    <link href="/static/lib/image-lightbox/css/lightbox.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block footer_references %}
+    <script src="/static/lib/image-lightbox/js/lightbox.min.js"></script>
+    {#    <script src="/static/lib/image-lightbox/js/lightbox-plus-jquery.min.js"></script>#}
+{% endblock %}
+{% block content %}
+    <style>
+
+       
+        
+        h2 {
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        p {
+            font-size: 16px;
+            color: #333;
+            margin: 10px 0;
+        }
+        
+        pre.document-content {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        .download-btn, .print-btn, .close-btn {
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .download-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .download-btn:hover {
+            background: #2980b9;
+        }
+        
+        .print-btn {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .print-btn:hover {
+            background: #219150;
+        }
+        
+        .close-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .close-btn:hover {
+            background: #c0392b;
+        }
+        
+        .print-section {
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+    </style>
+
+   
+    <div class="container">
+        <h2>موضوع: {{ doc.subject }}</h2>
+        <p><strong>مرحله:</strong> {{ doc.get_stage_display }}</p>
+        <p><strong>تاریخ ثبت:</strong> {{ doc.created_at|date:"Y/m/d" }}</p>
+        
+        <h3>متن لایحه:</h3>
+        <h4 class="document-content" id="printable-content">{{ doc.content }}</h4>
+        
+        <div class="print-section">
+            <button onclick="printDocument()" class="print-btn">چاپ متن لایحه</button>
+            <a href="{% url 'download_document_word' doc.pk %}" class="download-btn">دانلود متن لایحه</a>
+            <a href="javascript:window.close();" class="close-btn">بستن صفحه</a>
+    
+        </div>
+    </div>
+    
+    <script>
+    function printDocument() {
+        var printContents = document.getElementById("printable-content").innerHTML;
+        var originalContents = document.body.innerHTML;
+    
+        document.body.innerHTML = "<pre>" + printContents + "</pre>";
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
+    </script>
+    
+{% endblock %}

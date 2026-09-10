@@ -1,0 +1,643 @@
+{% extends 'shared/_layout.html' %}
+{% load render_partial %}
+{% load poll_extras %}
+{% load jalali_tags %}
+{% load jalali_filters %}
+{% load humanize %}
+
+{% block title %}
+    {{ movakel.name }}
+{% endblock %}
+
+{% block header_references %}
+    <link href="/static/lib/image-lightbox/css/lightbox.min.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block footer_references %}
+    <script src="/static/lib/image-lightbox/js/lightbox.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<section>
+    <div class="container">
+
+        <!-- ===================== هدر پرونده ===================== -->
+<!-- ===================== هدر پرونده ===================== -->
+        <div class="movakel-details case-header">
+            <div class="case-header-top">
+                <div class="case-header-identity">
+                    {% if movakel.image %}
+                        <img src="{{ movakel.image.url }}" alt="{{ movakel.name }}" class="case-avatar">
+                    {% endif %}
+                    <div class="case-header-info">
+                        <h1>{{ movakel.name }}</h1>
+                        <div class="case-meta">
+                            <span class="case-id"><i class="fa fa-folder-open"></i> شماره پرونده: {{ movakel.id }}</span>
+                            {% if movakel.mobile_number %}
+                                <span class="case-mobile"><i class="fa fa-phone"></i> {{ movakel.mobile_number }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== دکمه‌های هدر - تراز شده ===== -->
+                <div class="case-header-actions no-print">
+                    <a href="{% url 'edit_movakel_basic' movakel.slug %}" class="btn btn-warning btn-sm">
+                        <i class="fa fa-pencil"></i> ویرایش اطلاعات
+                    </a>
+                    {% if selected_service_type %}
+                        <a href="{% url 'service_type_detail' selected_service_type.id %}" class="btn btn-primary btn-sm">
+                            <i class="fa fa-cogs"></i> ویرایش خدمات
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-default btn-sm disabled">
+                            <i class="fa fa-plus"></i> ثبت خدمات
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'print_contract' movakel.id %}" class="btn btn-outline-navy btn-sm" target="_blank">
+                        <i class="fa fa-print"></i> چاپ قرارداد
+                    </a>
+                </div>
+            </div>
+
+            <!-- ===== نوار وضعیت پرونده - با سلکت نمایش داده شده ===== -->
+            <div class="case-status-bar no-print">
+                <div class="status-left">
+                    <span class="case-status-label"><i class="fa fa-flag"></i> وضعیت پرونده:</span>
+                    {% if movakel.case_status == 'in_progress' %}
+                        <span class="badge badge-info">🔄 در جریان</span>
+                    {% elif movakel.case_status == 'appeal' %}
+                        <span class="badge badge-warning">⚖️ تجدیدنظر</span>
+                    {% elif movakel.case_status == 'execution' %}
+                        <span class="badge badge-danger">⚙️ اجرای حکم</span>
+                    {% elif movakel.case_status == 'closed' %}
+                        <span class="badge badge-success">✅ مختومه</span>
+                    {% elif movakel.case_status == 'archived' %}
+                        <span class="badge badge-secondary">📦 بایگانی</span>
+                    {% endif %}
+                </div>
+
+                <form method="POST" action="{% url 'update_case_status' movakel.id %}" class="case-status-form">
+                    {% csrf_token %}
+                    <select name="case_status" class="form-control status-select">
+                        <option value="in_progress" {% if movakel.case_status == 'in_progress' %}selected{% endif %}>🔄 در جریان</option>
+                        <option value="appeal" {% if movakel.case_status == 'appeal' %}selected{% endif %}>⚖️ تجدیدنظر</option>
+                        <option value="execution" {% if movakel.case_status == 'execution' %}selected{% endif %}>⚙️ اجرای حکم</option>
+                        <option value="closed" {% if movakel.case_status == 'closed' %}selected{% endif %}>✅ مختومه</option>
+                        <option value="archived" {% if movakel.case_status == 'archived' %}selected{% endif %}>📦 بایگانی</option>
+                    </select>
+                    <button type="submit" class="btn status-submit-btn">
+                        <i class="fa fa-check"></i> تغییر وضعیت
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!-- ===================== تب‌های محتوا ===================== -->
+        <div class="shop-details-tab">
+            <div class="col-sm-12">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab-general" data-toggle="tab"><i class="fa fa-users"></i> ملاقات‌ها و مراجعات</a></li>
+                    <li><a href="#tab-services" data-toggle="tab"><i class="fa fa-briefcase"></i> خدمات و اقدامات</a></li>
+                    <li><a href="#tab-documents" data-toggle="tab"><i class="fa fa-file-text"></i> لوایح و اسناد</a></li>
+                    <li><a href="#tab-court" data-toggle="tab"><i class="fa fa-balance-scale"></i> دادگاه و مالی</a></li>
+                    <li><a href="#tab-notes" data-toggle="tab"><i class="fa fa-sticky-note-o"></i> ملاحظات</a></li>
+                </ul>
+            </div>
+
+            <div class="tab-content">
+
+                <!-- ============================================================ -->
+                <!-- ===== تب: ملاقات‌ها و مراجعات (اصلاح‌شده) ===== -->
+                <!-- ============================================================ -->
+                <div class="tab-pane fade active in" id="tab-general">
+                    <div class="col-sm-12">
+
+                        <!-- ===== ۱. اطلاعات شخصی فرد ملاقات‌کننده ===== -->
+                        <h3><i class="fa fa-user-circle" style="color:#1B2A4A;"></i> اطلاعات شخصی فرد ملاقات‌کننده</h3>
+                        {% if movakel.meetings.exists %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>نام و نام خانوادگی</th>
+                                        <th>کد ملی</th>
+                                        <th>تلفن ثابت</th>
+                                        <th>شماره همراه</th>
+                                        <th>تاریخ تولد</th>
+                                        <th>تحصیلات</th>
+                                        <th>کد پستی</th>
+                                        <th>آدرس</th>
+                                        <th>تاریخ ملاقات</th>
+                                        <th class="no-print">ویرایش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in movakel.meetings.all %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><strong>{{ meeting.full_name }}</strong></td>
+                                        <td>{{ meeting.national_id|default:"-" }}</td>
+                                        <td>{{ meeting.phone_number|default:"-" }}</td>
+                                        <td>{{ meeting.mobile_number|default:"-" }}</td>
+                                        <td>{{ meeting.birth_date_shamsi|default:"-" }}</td>
+                                        <td>{{ meeting.education|default:"-" }}</td>
+                                        <td>{{ meeting.postal_code|default:"-" }}</td>
+                                        <td style="max-width:150px; word-wrap:break-word;">{{ meeting.address|default:"-"|truncatechars:30 }}</td>
+                                        <td>{{ meeting.meeting_date_shamsi|default:"-" }}</td>
+                                        <td class="row-edit-cell no-print">
+                                            <a href="{% url 'edit_request_meeting' meeting.id %}" class="btn btn-warning btn-sm row-edit-btn">
+                                                <i class="fa fa-pencil"></i> ویرایش
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fa fa-users"></i>
+                            <p>هیچ ملاقات‌کننده‌ای ثبت نشده است.</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- ===== ۲. اطلاعات زمان ملاقات‌های اولیه ===== -->
+                        <h3><i class="fa fa-calendar" style="color:#1B2A4A;"></i> اطلاعات زمان ملاقات‌های اولیه</h3>
+                        {% if meetings %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>نوع ملاقات</th>
+                                        <th>موضوع ملاقات</th>
+                                        <th>تاریخ</th>
+                                        <th>مدت جلسه</th>
+                                        <th class="no-print">پرینت</th>
+                                        <th class="no-print">ویرایش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in meetings %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><span class="badge badge-info">{{ meeting.get_meeting_type_display }}</span></td>
+                                        <td>
+                                            {% if meeting.meeting_subject.all %}
+                                                {% for subject in meeting.meeting_subject.all %}
+                                                    <span class="badge badge-primary">{{ subject.name }}</span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="text-muted">موضوعی انتخاب نشده</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if meeting.meeting_date %}
+                                                {{ meeting.meeting_date|to_jalali:"%Y/%m/%d" }}
+                                            {% else %}
+                                                <span class="text-muted">ثبت نشده</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if meeting.duration %}
+                                                {{ meeting.duration }} دقیقه
+                                            {% else %}
+                                                <span class="text-muted">ثبت نشده</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="no-print">
+                                            <a href="{% url 'meeting_pdf' meeting.id %}" target="_blank" class="btn btn-primary btn-sm">
+                                                <i class="fa fa-file-pdf-o"></i> PDF
+                                            </a>
+                                        </td>
+                                        <td class="row-edit-cell no-print">
+                                            <a href="{% url 'edit_request_meeting' meeting.id %}" class="btn btn-warning btn-sm row-edit-btn">
+                                                <i class="fa fa-pencil"></i> ویرایش
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fa fa-calendar"></i>
+                            <p>هیچ ملاقاتی ثبت نشده است.</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- ===== ۳. لیست مراجعات موکل به دفتر ===== -->
+                        <h3><i class="fa fa-building" style="color:#1B2A4A;"></i> لیست مراجعات موکل به دفتر ({{ visits|length }})</h3>
+                        {% if visits %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>تاریخ مراجعه</th>
+                                        <th>ساعت شروع</th>
+                                        <th>ساعت پایان</th>
+                                        <th>مدت جلسه</th>
+                                        <th>توضیحات</th>
+                                        <th class="no-print">ویرایش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for visit in visits %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ visit.visit_date|default:"---" }}</td>
+                                        <td>{{ visit.start_time|time:"H:i"|default:"-" }}</td>
+                                        <td>{{ visit.end_time|time:"H:i"|default:"-" }}</td>
+                                        <td>
+                                            {% if visit.visit_duration %}
+                                                <span class="badge badge-success">{{ visit.visit_duration }} دقیقه</span>
+                                            {% else %}
+                                                <span class="text-danger">ثبت نشده</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="max-width:200px; word-wrap:break-word;">{{ visit.description|default:"-"|truncatechars:40 }}</td>
+                                        <td class="row-edit-cell no-print">
+                                            <a href="{% url 'edit_visit' visit.id %}" class="btn btn-warning btn-sm row-edit-btn">
+                                                <i class="fa fa-pencil"></i> ویرایش
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fa fa-building"></i>
+                            <p>هیچ مراجعه‌ای ثبت نشده است.</p>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+                <!-- ===== پایان تب ملاقات‌ها ===== -->
+
+                <!-- ===== تب: خدمات و اقدامات ===== -->
+                <div class="tab-pane fade" id="tab-services">
+                    <div class="col-sm-12">
+
+                        <h3>اقدامات/خدمات (مربوط به هزینه دادرسی)</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>نوع خدمت</th>
+                                        <th>وضعیت</th>
+                                        <th class="no-print">ویرایش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if selected_service_type %}
+                                    <tr>
+                                        <td>هزینه ارسال لوایح</td>
+                                        <td>{% if selected_service_type.bill_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه دادرسی بدوی (تمبر دادرسی)</td>
+                                        <td>{% if selected_service_type.initial_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه اعتراض (هزینه دادرسی)</td>
+                                        <td>{% if selected_service_type.appeal_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه اجرای احکام</td>
+                                        <td>{% if selected_service_type.enforcement_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه تنظیم شکوائیه</td>
+                                        <td>{% if selected_service_type.petition_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه سفر (هتل، وسیله نقلیه و غیره)</td>
+                                        <td>{% if selected_service_type.travel_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه‌های متفرقه (اوراق، سی‌دی و غیره)</td>
+                                        <td>{% if selected_service_type.miscellaneous_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه تنظیم قراردادهای متفرقه</td>
+                                        <td>{% if selected_service_type.contract %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه اخذ ابلاغیه از سامانه</td>
+                                        <td>{% if selected_service_type.notification_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه دفتر خدمات قضائی</td>
+                                        <td>{% if selected_service_type.court_service_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>اظهارنامه</td>
+                                        <td>{% if selected_service_type.document_fee %}<span class="badge badge-success">✅</span>{% else %}<span class="badge badge-danger">❌</span>{% endif %}</td>
+                                        <td class="row-edit-cell no-print"><a href="{% url 'edit_service_type' selected_service_type.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a></td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">هیچ خدمتی ثبت نشده است</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>اقدامات / خدمات (مربوط به اختیار وکیل)</h3>
+                        {% if selected_service_type %}
+                            <form method="POST" action="{% url 'service_type_detail' selected_service_type.id %}">
+                                {% csrf_token %}
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>نوع خدمت</th>
+                                                <th>وضعیت</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>مطالعه پرونده</td>
+                                                <td><input type="checkbox" name="office_study" value="1" {% if selected_service_type.office_study %}checked{% endif %}></td>
+                                            </tr>
+                                            <tr>
+                                                <td>دفاع</td>
+                                                <td><input type="checkbox" name="defense" value="1" {% if selected_service_type.defense %}checked{% endif %}></td>
+                                            </tr>
+                                            <tr>
+                                                <td>مشاوره</td>
+                                                <td><input type="checkbox" name="consultation" value="1" {% if selected_service_type.consultation %}checked{% endif %}></td>
+                                            </tr>
+                                            <tr>
+                                                <td>بررسی مدارک</td>
+                                                <td><input type="checkbox" name="check_documents" value="1" {% if selected_service_type.check_documents %}checked{% endif %}></td>
+                                            </tr>
+                                            <tr>
+                                                <td>تنظیم قراردهای متفرقه</td>
+                                                <td><input type="checkbox" name="contract" value="1" {% if selected_service_type.contract %}checked{% endif %}></td>
+                                            </tr>
+                                            <tr>
+                                                <td>اخذ ابلاغیه</td>
+                                                <td><input type="checkbox" name="notification" value="1" {% if selected_service_type.notification %}checked{% endif %}></td>
+                                            </tr>
+                                            <tr>
+                                                <td>لایحه</td>
+                                                <td><input type="checkbox" name="bill" value="1" {% if selected_service_type.bill %}checked{% endif %}></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block btn-lg" aria-label="ثبت تغییرات">
+                                    ثبت تغییرات
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="empty-state"><p>خدمت ثبت نشده است</p></div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- ===== تب: لوایح و اسناد ===== -->
+                <div class="tab-pane fade" id="tab-documents">
+                    <div class="col-sm-12">
+
+                        <h3>لایحه‌ها</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>موضوع</th>
+                                        <th>نام موکل</th>
+                                        <th>مرحله</th>
+                                        <th>شماره مکانیزه</th>
+                                        <th>تاریخ</th>
+                                        <th>خلاصه لایحه</th>
+                                        <th>مشاهده لایحه</th>
+                                        <th class="no-print">ویرایش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if defense_documents %}
+                                        {% for doc in defense_documents %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ doc.subject }}</td>
+                                                <td>{{ doc.movakel.full_name }}</td>
+                                                <td>{{ doc.get_stage_display }}</td>
+                                                <td>{{ mechanized_number|default:"-" }}</td>
+                                                <td>{{ doc.get_jalali_date }}</td>
+                                                <td>
+                                                    <details>
+                                                        <summary>خلاصه متن لایحه</summary>
+                                                        <pre>{{ doc.content|slice:":15" }}...</pre>
+                                                    </details>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'defense_document_detail' doc.pk %}" target="_blank">مشاهده متن لایحه</a>
+                                                </td>
+                                                <td class="row-edit-cell no-print">
+                                                    <a href="{% url 'edit_defense_document' doc.pk %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="9" class="text-center">هیچ لایحه‌ای ثبت نشده است.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>فایل‌های مورد نیاز</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>نام فایل</th>
+                                        <th>دانلود</th>
+                                        <th class="no-print">ویرایش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if pdf_files %}
+                                        {% for pdf in pdf_files %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ pdf.file.name }}</td>
+                                                <td><a href="{{ pdf.file.url }}" target="_blank" class="btn btn-primary btn-sm">دانلود</a></td>
+                                                <td class="row-edit-cell no-print">
+                                                    <a href="{% url 'edit_pdf_file' pdf.id %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">هیچ فایل PDF وجود ندارد.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ===== تب: دادگاه و مالی ===== -->
+                <div class="tab-pane fade" id="tab-court">
+                    <div class="col-sm-12">
+
+                        <div class="text-center no-print" style="margin-bottom:24px;">
+                            <a href="{% url 'payment_details' movakel.id %}" class="btn btn-success btn-lg">
+                                <i class="fa fa-money"></i> نمایش مبالغ و پرداخت‌ها
+                            </a>
+                        </div>
+
+                        <h3>📄 اطلاعات پرونده و دادگاه</h3>
+                        {% load jalali_tags %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>مرحله</th>
+                                        <th>شعبه رسیدگی‌کننده</th>
+                                        <th>وقت رسیدگی / نظارت</th>
+                                        <th>شماره بایگانی</th>
+                                        <th>شماره دادنامه</th>
+                                        <th>تاریخ ابلاغ</th>
+                                        <th>تاریخ مزایده</th>
+                                        <th>نتیجه رأی</th>
+                                        <th>ملاحظات</th>
+                                        <th class="no-print">ویرایش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>بدوی</td>
+                                        <td>{{ movakel.primary_branch|default:"-" }}</td>
+                                        <td>{{ movakel.hearing_date|to_jalali:"%Y/%m/%d" }} - {{ movakel.hearing_time|default:"-" }}</td>
+                                        <td>{{ movakel.primary_archive_no|default:"-" }}</td>
+                                        <td>{{ movakel.primary_court_number|default:"-" }}</td>
+                                        <td>{{ movakel.primary_court_notification_date|to_jalali:"%Y/%m/%d" }}</td>
+                                        <td>-</td>
+                                        <td>{{ movakel.primary_court_result|default:"-" }}</td>
+                                        <td rowspan="3">{{ movakel.final_result|default:"نتیجه مشخص نشده" }}</td>
+                                        <td class="row-edit-cell no-print" rowspan="3">
+                                            <a href="{% url 'edit_court_info' movakel.slug %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>تجدیدنظر</td>
+                                        <td>{{ movakel.appeal_branch|default:"-" }}</td>
+                                        <td>{{ movakel.hearing_date|to_jalali:"%Y/%m/%d" }} - {{ movakel.hearing_time|default:"-" }}</td>
+                                        <td>{{ movakel.appeal_archive_no|default:"-" }}</td>
+                                        <td>{{ movakel.appeal_court_number|default:"-" }}</td>
+                                        <td>{{ movakel.appeal_court_notification_date|to_jalali:"%Y/%m/%d" }}</td>
+                                        <td>-</td>
+                                        <td>{{ movakel.appeal_court_result|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>اجرای احکام</td>
+                                        <td>{{ movakel.executive_branch|default:"-" }}</td>
+                                        <td>{{ movakel.hearing_date|to_jalali:"%Y/%m/%d" }} - {{ movakel.hearing_time|default:"-" }}</td>
+                                        <td>{{ movakel.executive_archive_no|default:"-" }}</td>
+                                        <td>{{ movakel.executive_case_number|default:"-" }}</td>
+                                        <td>{{ movakel.executive_case_notification_date|to_jalali:"%Y/%m/%d" }}</td>
+                                        <td>{{ movakel.auction_date|to_jalali:"%Y/%m/%d" }}</td>
+                                        <td>{{ movakel.executive_court_result|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ===== تب: ملاحظات ===== -->
+                <div class="tab-pane fade" id="tab-notes">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td style="width:18%;"><strong>ملاحظات پرونده</strong></td>
+                                        <td>{{ movakel.description|linebreaksbr|safe }}</td>
+                                        <td class="row-edit-cell no-print">
+                                            <a href="{% url 'edit_movakel_notes' movakel.slug %}" class="btn btn-warning btn-sm row-edit-btn">✏️ ویرایش</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================== پرونده‌های مرتبط ===================== -->
+        <div class="recommended_items">
+            <h2 class="title text-center">پرونده‌های مرتبط</h2>
+            <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    {% for group in related_movakels %}
+                        <div class="item {% if forloop.first %}active{% endif %}">
+                            {% for movakel in group %}
+                                {% include 'includes/movakel_item_partial.html' with movakel=movakel col_size=4 %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if related_movakels|length > 1 %}
+                    <a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ====== مودال عمومی برای ویرایش (Bootstrap 3) ====== -->
+<div class="modal fade" id="universalEditModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modalTitle">ویرایش</h4>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <p class="text-center">در حال بارگذاری...</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ====== پایان مودال ====== -->
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'shared/_layout.html' %}
+
+{% block title %}جستجوی پیشرفته{% endblock %}
+
+{% block content %}
+<div class="container mt-4" dir="rtl">
+    <h4 class="mb-4">🔍 جستجوی پیشرفته پرونده‌ها</h4>
+
+    <!-- فرم جستجو -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="">
+                <div class="row g-3">
+
+                    <!-- جستجوی متنی -->
+                    <div class="col-md-12">
+                        <input
+                            type="text"
+                            name="q"
+                            class="form-control form-control-lg"
+                            placeholder="نام موکل، شماره مکانیزه، موبایل، شماره پرونده..."
+                            value="{{ query }}"
+                            autofocus
+                        >
+                    </div>
+
+                    <!-- دسته‌بندی -->
+                    <div class="col-md-4">
+                        <label class="form-label">دسته‌بندی</label>
+                        <select name="category" class="form-select">
+                            <option value="">همه دسته‌ها</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                                {{ cat.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- وضعیت -->
+                    <div class="col-md-4">
+                        <label class="form-label">وضعیت پرونده</label>
+                        <select name="status" class="form-select">
+                            <option value="">همه</option>
+                            <option value="active" {% if selected_status == 'active' %}selected{% endif %}>فعال</option>
+                            <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>غیرفعال</option>
+                        </select>
+                    </div>
+
+                    <!-- تاریخ از -->
+                    <div class="col-md-2">
+                        <label class="form-label">از تاریخ</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+                    </div>
+
+                    <!-- تاریخ تا -->
+                    <div class="col-md-2">
+                        <label class="form-label">تا تاریخ</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+                    </div>
+
+                    <!-- دکمه‌ها -->
+                    <div class="col-md-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">🔍 جستجو</button>
+                        <a href="{% url 'advanced_search' %}" class="btn btn-outline-secondary">پاک کردن فیلترها</a>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نتایج -->
+    {% if query or selected_category or selected_status or date_from or date_to %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted">{{ result_count }} پرونده یافت شد</span>
+    </div>
+
+    {% if movakels %}
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>نام موکل</th>
+                    <th>شماره مکانیزه</th>
+                    <th>موبایل</th>
+                    <th>دسته‌بندی</th>
+                    <th>وضعیت</th>
+                    <th>تاریخ وکالت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in movakels %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ m.name }}</td>
+                    <td>{{ m.mechanized_number|default:"-" }}</td>
+                    <td>{{ m.mobile_number }}</td>
+                    <td>{{ m.category|default:"-" }}</td>
+                    <td>
+                        {% if m.is_active %}
+                            <span class="badge bg-success">فعال</span>
+                        {% else %}
+                            <span class="badge bg-secondary">غیرفعال</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ m.contract_date|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-primary">مشاهده</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <p class="fs-5">❌ پرونده‌ای با این مشخصات یافت نشد</p>
+    </div>
+    {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}

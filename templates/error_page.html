@@ -1,0 +1,22 @@
+{% extends 'shared/_layout.html' %}
+
+{% block title %}خطا{% endblock %}
+
+{% block content %}
+<section class="py-5" dir="rtl">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="card shadow-sm border-danger">
+                    <div class="card-body py-5">
+                        <h1 class="display-4 text-danger">⚠️</h1>
+                        <h4 class="mt-3">خطایی رخ داده است</h4>
+                        <p class="text-muted mt-2">{{ message|default:"صفحه‌ای یافت نشد." }}</p>
+                        <a href="{% url 'movakel-list' %}" class="btn btn-primary mt-3">بازگشت به لیست پرونده‌ها</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

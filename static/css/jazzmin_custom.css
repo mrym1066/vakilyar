@@ -1,0 +1,196 @@
+/* =============================================
+   وکیل‌یار — jazzmin_custom.css (AdminLTE 4)
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+
+/* ── فونت و RTL پایه ── */
+*:not(i):not(.fas):not(.far):not(.fab):not(.fal):not(.fad) {
+    font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+}
+body { direction: rtl !important; text-align: right !important; }
+html, body { overflow-x: hidden !important; }
+
+/* ── navbar رنگ تیره — همه جا ── */
+.app-header {
+    background-color: #1a2035 !important;
+}
+.app-header .nav-link,
+.app-header .nav-link i,
+[data-lte-toggle="sidebar"] i {
+    color: #ffffff !important;
+}
+
+/* ── RTL سایدبار — فقط desktop ── */
+@media (min-width: 992px) {
+    .app-sidebar {
+        right: 0 !important;
+        left: auto !important;
+    }
+    .app-main,
+    .app-header,
+    .app-footer {
+        margin-right: 250px !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* ── RTL عمومی ── */
+.navbar-nav.ms-auto { margin-right: auto !important; margin-left: 0 !important; }
+.sidebar-menu .nav-link { text-align: right !important; }
+.nav-treeview { padding-right: 1rem !important; padding-left: 0 !important; }
+.nav-icon { margin-left: 0.5rem !important; margin-right: 0 !important; }
+.nav-arrow { float: left !important; margin-left: 0 !important; }
+table { direction: rtl !important; }
+th, td { text-align: right !important; }
+.btn-group.float-end { float: left !important; }
+label { text-align: right !important; display: block; }
+select, input, textarea { text-align: right !important; direction: rtl !important; }
+.breadcrumb { direction: rtl; }
+.float-sm-end { float: right !important; }
+
+/* ══════════════════════════════════════
+   Tablet & Mobile ≤ 991px
+══════════════════════════════════════ */
+@media (max-width: 991px) {
+
+    [data-lte-toggle="sidebar"] {
+        display: inline-flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 1.2rem !important;
+        padding: 8px 12px !important;
+    }
+    #jazzy-usermenu {
+        left: 0 !important;
+        right: auto !important;
+        text-align: right !important;
+        direction: rtl !important;
+    }
+    .app-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        left: auto !important;
+        width: 250px !important;
+        height: 100vh !important;
+        z-index: 1050 !important;
+        background-color: #343a40 !important;
+        transition: transform 0.3s ease !important;
+        transform: translateX(100%) !important;
+    }
+
+    body:not(.sidebar-collapse) .app-sidebar {
+        transform: translateX(0) !important;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        z-index: 1040 !important;
+        cursor: pointer;
+    }
+
+    body:not(.sidebar-collapse) .sidebar-overlay {
+        display: block !important;
+    }
+
+    .app-main,
+    .app-header,
+    .app-footer {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .app-sidebar .nav-link,
+    .app-sidebar .nav-link p,
+    .app-sidebar .nav-icon,
+    .app-sidebar .brand-text,
+    .app-sidebar .user-panel .info a {
+        color: #c2c7d0 !important;
+    }
+
+    .app-sidebar .nav-link:hover,
+    .app-sidebar .nav-link.active {
+        color: #ffffff !important;
+        background-color: rgba(255,255,255,0.1) !important;
+    }
+
+    .app-sidebar .nav-arrow {
+        color: #c2c7d0 !important;
+    }
+
+    .table-responsive { overflow-x: auto !important; }
+    table { font-size: 12px !important; }
+    th, td { padding: 8px 10px !important; }
+
+    .col-md-6 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+}
+
+/* ══════════════════════════════════════
+   Mobile ≤ 767px
+══════════════════════════════════════ */
+@media (max-width: 767px) {
+
+    body { font-size: 13px !important; }
+
+    .app-content { padding: 10px !important; }
+    .app-content-header { padding: 8px 12px !important; }
+    .app-content-header h3 { font-size: 15px !important; }
+
+    .card { margin-bottom: 10px !important; }
+    .card-header { padding: 10px 12px !important; font-size: 13px !important; }
+    .card-body { padding: 10px !important; }
+
+    .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    table { font-size: 11px !important; }
+    th, td { padding: 7px 8px !important; }
+    .btn-sm { font-size: 10px !important; padding: 3px 7px !important; }
+
+    .col-lg-9, .col-lg-3,
+    .col-md-6, .col-md-4, .col-md-3,
+    .col-sm-6 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .form-control { font-size: 13px !important; }
+    .submit-row { flex-wrap: wrap !important; padding: 8px !important; }
+    .submit-row input, .submit-row a {
+        width: 100% !important;
+        text-align: center !important;
+        margin: 3px 0 !important;
+        display: block !important;
+    }
+
+    #changelist-filter { width: 100% !important; float: none !important; }
+    #changelist { margin: 0 !important; }
+    #searchbar { width: 100% !important; }
+
+    .pagination { flex-wrap: wrap !important; gap: 3px !important; }
+    .page-link { padding: 5px 9px !important; font-size: 12px !important; }
+
+    .app-footer { padding: 10px 14px !important; font-size: 12px !important; }
+    .app-footer .float-end { float: none !important; display: block !important; }
+}
+
+/* ══════════════════════════════════════
+   Small Mobile ≤ 480px
+══════════════════════════════════════ */
+@media (max-width: 480px) {
+    .app-content-header h3 { font-size: 13px !important; }
+    table { font-size: 10px !important; }
+    th, td { padding: 5px 6px !important; }
+    .btn-sm { font-size: 9px !important; padding: 2px 6px !important; }
+}

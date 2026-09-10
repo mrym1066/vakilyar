@@ -1,0 +1,158 @@
+/* =============================================
+   وکیل‌یار — responsive-fix.css
+   ریسپانسیو پنل ادمین سفارشی (BeyondAdmin RTL)
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+
+/* ── فونت فارسی ── */
+* { font-family: 'Vazirmatn', Tahoma, sans-serif !important; }
+
+/* ── دکمه همبرگر موبایل ── */
+.mobile-sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 9999;
+    background: #2c3e50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ── Overlay پشت سایدبار در موبایل ── */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 8000;
+}
+.sidebar-overlay.active { display: block; }
+
+/* ══════════════════════════════════
+   Tablet — ≤ 991px
+══════════════════════════════════ */
+@media (max-width: 991px) {
+
+    .mobile-sidebar-toggle { display: block; }
+
+    /* سایدبار از راست خارج میشه */
+    .page-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        right: -240px !important;
+        width: 240px !important;
+        height: 100vh !important;
+        z-index: 9000 !important;
+        transition: right 0.3s ease !important;
+        overflow-y: auto !important;
+    }
+
+    /* وقتی باز باشه */
+    .page-sidebar.open {
+        right: 0 !important;
+        box-shadow: -4px 0 15px rgba(0,0,0,0.3) !important;
+    }
+
+    /* محتوا تمام عرض */
+    .page-content {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .page-container { margin-right: 0 !important; }
+
+    /* navbar */
+    .navbar-inner { padding: 0 10px !important; }
+    .navbar-account { margin-top: 5px !important; }
+
+    /* جداول اسکرول‌پذیر */
+    .table-responsive { overflow-x: auto !important; }
+    table { min-width: 500px; }
+
+    /* grid */
+    .col-sm-3, .col-sm-4, .col-sm-6 { width: 50% !important; float: right !important; }
+}
+
+/* ══════════════════════════════════
+   Mobile — ≤ 767px
+══════════════════════════════════ */
+@media (max-width: 767px) {
+
+    body { font-size: 13px !important; }
+
+    /* navbar */
+    .navbar { height: auto !important; }
+    .navbar-inner { min-height: 50px !important; padding: 5px 50px 5px 10px !important; }
+    .navbar-brand, .navbar-type { font-size: 14px !important; }
+
+    /* صفحه */
+    .page-body { padding: 10px !important; }
+    .page-breadcrumbs { padding: 8px 15px !important; }
+    .page-header { padding: 10px 15px !important; }
+    .page-header h1 { font-size: 18px !important; }
+
+    /* کارت‌ها / ویجت‌ها */
+    .col-sm-3, .col-sm-4, .col-sm-6,
+    .col-md-3, .col-md-4, .col-md-6 {
+        width: 100% !important;
+        float: none !important;
+        margin-bottom: 12px !important;
+    }
+
+    /* جداول */
+    .table-responsive { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+    table { font-size: 12px !important; }
+    th, td { padding: 7px 8px !important; white-space: nowrap !important; }
+
+    /* دکمه‌ها */
+    .btn { font-size: 12px !important; padding: 5px 10px !important; }
+
+    /* فرم‌ها */
+    .form-control { font-size: 13px !important; }
+    .form-group { margin-bottom: 10px !important; }
+
+    /* chatbar حذف */
+    .page-chatbar { display: none !important; }
+
+    /* آیکون‌های navbar */
+    .account-area > li { padding: 0 5px !important; }
+    .account-area .icon { font-size: 16px !important; }
+
+    /* widget boxes */
+    .widget-box { margin-bottom: 15px !important; }
+    .widget-body { padding: 10px !important; }
+
+    /* breadcrumb */
+    .breadcrumb { font-size: 12px !important; }
+    .breadcrumb > li { display: inline !important; }
+}
+
+/* ══════════════════════════════════
+   Small Mobile — ≤ 480px
+══════════════════════════════════ */
+@media (max-width: 480px) {
+
+    .navbar-inner { padding: 5px 50px 5px 5px !important; }
+
+    /* آمار داشبورد */
+    .stat-box { margin-bottom: 10px !important; }
+
+    /* فرم‌ها تک‌ستونه */
+    .col-xs-6 { width: 100% !important; float: none !important; }
+
+    /* دکمه‌های action */
+    .header-buttons { display: none !important; }
+
+    /* جدول font کوچکتر */
+    table { font-size: 11px !important; }
+    th, td { padding: 5px 6px !important; }
+}

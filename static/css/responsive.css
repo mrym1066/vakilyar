@@ -1,0 +1,346 @@
+/* ============================================================
+   وکیل‌یار — responsive.css (نسخه تمیز)
+   ============================================================ */
+
+/* ── پایه ── */
+* {
+    box-sizing: border-box !important;
+}
+html,
+body {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
+img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+body {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* ── RTL fix برای Bootstrap ── */
+.pull-right {
+    float: right !important;
+}
+.pull-left {
+    float: left !important;
+}
+.text-right {
+    text-align: right !important;
+}
+.text-left {
+    text-align: left !important;
+}
+
+/* ── جدول ریسپانسیو ── */
+.table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+}
+
+/* ── همبرگر ── */
+.navbar-toggle {
+    display: none !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 5px !important;
+    padding: 8px 10px !important;
+    cursor: pointer !important;
+    float: left !important;
+    margin: 8px 4px !important;
+}
+.navbar-toggle .icon-bar {
+    display: block !important;
+    width: 22px !important;
+    height: 2px !important;
+    background: #fff !important;
+    border-radius: 2px !important;
+    margin: 5px 0 !important;
+}
+
+/* ══════════════════════════════════
+   Tablet  ≤ 991px
+══════════════════════════════════ */
+@media (max-width: 991px) {
+
+    /* مخفی کردن هدر بالایی */
+    .header_top {
+        display: none !important;
+    }
+
+    /* هدر میانی */
+    .header-middle .col-sm-4,
+    .header-middle .col-sm-6,
+    .header-middle .col-sm-8 {
+        width: 100% !important;
+        float: none !important;
+        text-align: center !important;
+    }
+
+    .header-middle .shop-menu {
+        float: none !important;
+        text-align: center !important;
+    }
+    .header-middle .shop-menu .nav {
+        display: inline-flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        padding: 6px 0 !important;
+    }
+    .header-middle .shop-menu .nav li a {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+        background: #F1EFF9 !important;
+        border-radius: 5px !important;
+        color: #1B2A4A !important;
+        font-weight: 600 !important;
+    }
+
+    /* همبرگر */
+    .navbar-toggle {
+        display: block !important;
+    }
+
+    .header-bottom .col-sm-3,
+    .header-bottom .col-sm-9 {
+        width: 50% !important;
+        float: right !important;
+        padding: 0 8px !important;
+    }
+
+    /* جستجو */
+    .search_box input {
+        width: 100% !important;
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+        border-radius: 5px !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        color: #fff !important;
+    }
+
+    /* منو */
+    .mainmenu .navbar-collapse:not(.in) {
+        display: none !important;
+    }
+    .mainmenu .navbar-collapse.in {
+        display: block !important;
+    }
+    .mainmenu {
+        width: 100% !important;
+        float: none !important;
+    }
+    .mainmenu ul {
+        flex-direction: column !important;
+        width: 100% !important;
+        background: #243660 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .mainmenu ul li {
+        width: 100% !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        float: none !important;
+    }
+    .mainmenu ul li a {
+        padding: 13px 20px !important;
+        display: block !important;
+        border-bottom: none !important;
+        font-size: 14px !important;
+    }
+
+    /* کارت‌ها */
+    .col-sm-4 {
+        width: 50% !important;
+        float: right !important;
+    }
+
+    /* فوتر */
+    .footer-widget .col-sm-3 {
+        width: 50% !important;
+        float: right !important;
+    }
+}
+
+/* ══════════════════════════════════
+   Mobile  ≤ 767px
+══════════════════════════════════ */
+@media (max-width: 767px) {
+
+    body {
+        font-size: 14px !important;
+    }
+
+    /* همه ستون‌ها تک‌ستونه */
+    [class*="col-sm-"],
+    [class*="col-md-"],
+    [class*="col-lg-"] {
+        width: 100% !important;
+        float: none !important;
+        padding-right: 10px !important;
+        padding-left: 10px !important;
+    }
+
+    .container {
+        padding-right: 10px !important;
+        padding-left: 10px !important;
+    }
+    .row {
+        margin-right: -10px !important;
+        margin-left: -10px !important;
+    }
+
+    /* هدر */
+    .header-bottom .col-sm-3,
+    .header-bottom .col-sm-9 {
+        width: 100% !important;
+        float: none !important;
+    }
+    .search_box {
+        padding: 8px 0 6px !important;
+    }
+    .navbar-header {
+        text-align: left !important;
+        padding: 6px 0 !important;
+    }
+    .mainmenu {
+        float: none !important;
+        width: 100% !important;
+    }
+
+    /* کارت موکل */
+    .movakel-image-wrapper {
+        margin-bottom: 14px !important;
+    }
+    .movakelinfo {
+        padding: 14px 10px 10px !important;
+    }
+    .movakelinfo h2 {
+        font-size: 15px !important;
+    }
+    .movakelinfo p {
+        font-size: 12px !important;
+    }
+    .movakel-overlay {
+        display: none !important;
+    }
+
+    /* عنوان */
+    h2.title {
+        font-size: 17px !important;
+        margin: 18px 0 12px !important;
+    }
+
+    /* فرم ورود */
+    .signup-form {
+        margin: 14px 8px !important;
+        padding: 20px 14px !important;
+        border-radius: 8px !important;
+    }
+    .signup-form h2 {
+        font-size: 18px !important;
+    }
+
+    /* دکمه‌ها */
+    .btn {
+        font-size: 12px !important;
+        padding: 7px 12px !important;
+    }
+
+    /* صفحه‌بندی */
+    .pagination {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+    .pagination li {
+        margin-bottom: 4px !important;
+    }
+    .pagination li a {
+        padding: 5px 9px !important;
+        font-size: 12px !important;
+    }
+
+    /* فوتر */
+    footer {
+        padding: 16px 0 !important;
+        font-size: 12px !important;
+        text-align: center !important;
+    }
+    .footer-widget .col-sm-3 {
+        width: 100% !important;
+        float: none !important;
+    }
+
+    /* لوگو */
+    .logo span {
+        font-size: 18px !important;
+    }
+}
+
+/* ══════════════════════════════════
+   Small Mobile  ≤ 480px
+══════════════════════════════════ */
+@media (max-width: 480px) {
+
+    .container {
+        padding-right: 6px !important;
+        padding-left: 6px !important;
+    }
+
+    /* منوی کاربر */
+    .header-middle .shop-menu .nav li a {
+        font-size: 11px !important;
+        padding: 4px 8px !important;
+    }
+
+    /* کارت‌ها */
+    .movakelinfo img {
+        width: 64px !important;
+        height: 64px !important;
+    }
+    .movakelinfo h2 {
+        font-size: 13px !important;
+    }
+
+    /* فرم */
+    .form-control {
+        font-size: 13px !important;
+        padding: 8px 10px !important;
+    }
+    label {
+        font-size: 12px !important;
+    }
+
+    /* عنوان */
+    h2.title {
+        font-size: 15px !important;
+    }
+
+    /* جدول */
+    table {
+        font-size: 11px !important;
+    }
+    table th,
+    table td {
+        padding: 6px 8px !important;
+    }
+
+    /* دکمه‌ها */
+    .btn {
+        font-size: 11px !important;
+        padding: 5px 10px !important;
+    }
+
+    /* لوگو */
+    .header-middle .logo img {
+        max-height: 40px !important;
+    }
+    .header-bottom .mainmenu ul li a {
+        font-size: 13px !important;
+        padding: 10px 16px !important;
+    }
+}

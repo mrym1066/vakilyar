@@ -1,0 +1,162 @@
+{% extends 'shared/_layout.html' %}
+
+{% block title %}تقویم جلسات دادگاه{% endblock %}
+
+{% block content %}
+<div class="container mt-4" dir="rtl">
+    <h4 class="mb-4">🏛️ تقویم جلسات دادگاه</h4>
+
+    <!-- هشدار جلسات امروز -->
+    {% if today_count > 0 %}
+    <div class="alert alert-danger d-flex align-items-center mb-4">
+        <span class="fs-4 me-2">⚠️</span>
+        <div>
+            امروز <strong>{{ today_count }} جلسه</strong> دارید!
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- تب‌ها -->
+    <ul class="nav nav-tabs mb-3" id="hearingTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#today">
+                امروز
+                {% if today_count > 0 %}
+                <span class="badge bg-danger">{{ today_count }}</span>
+                {% endif %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#upcoming">
+                آینده
+                <span class="badge bg-primary">{{ upcoming_count }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#past">گذشته</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- جلسات امروز -->
+        <div class="tab-pane fade show active" id="today">
+            {% if today_hearings %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>نام موکل</th>
+                            <th>شماره مکانیزه</th>
+                            <th>زمان جلسه</th>
+                            <th>شعبه بدوی</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in today_hearings %}
+                        <tr>
+                            <td>{{ m.name }}</td>
+                            <td>{{ m.mechanized_number|default:"-" }}</td>
+                            <td>
+                                {% if m.hearing_time %}
+                                    <span class="badge bg-danger">{{ m.hearing_time }}</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ m.primary_branch|default:"-" }}</td>
+                            <td>
+                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-primary">مشاهده پرونده</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <p class="fs-5">✅ امروز جلسه‌ای ندارید</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- جلسات آینده -->
+        <div class="tab-pane fade" id="upcoming">
+            {% if upcoming_hearings %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>نام موکل</th>
+                            <th>تاریخ جلسه</th>
+                            <th>زمان</th>
+                            <th>شعبه</th>
+                            <th>مانده تا جلسه</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in upcoming_hearings %}
+                        <tr>
+                            <td>{{ m.name }}</td>
+                            <td>{{ m.hearing_date }}</td>
+                            <td>{{ m.hearing_time|default:"-" }}</td>
+                            <td>{{ m.primary_branch|default:"-" }}</td>
+                            <td>
+                                {% with days_left=m.hearing_date|timeuntil %}
+                                <span class="badge bg-info text-dark">{{ days_left }}</span>
+                                {% endwith %}
+                            </td>
+                            <td>
+                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-primary">مشاهده</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <p class="fs-5">📅 جلسه‌ای در ۳۰ روز آینده ثبت نشده</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- جلسات گذشته -->
+        <div class="tab-pane fade" id="past">
+            {% if past_hearings %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>نام موکل</th>
+                            <th>تاریخ جلسه</th>
+                            <th>زمان</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in past_hearings %}
+                        <tr class="text-muted">
+                            <td>{{ m.name }}</td>
+                            <td>{{ m.hearing_date }}</td>
+                            <td>{{ m.hearing_time|default:"-" }}</td>
+                            <td>
+                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-secondary">مشاهده</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <p class="fs-5">📂 جلسه‌ای در ۳۰ روز گذشته ثبت نشده</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

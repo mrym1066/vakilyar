@@ -1,0 +1,24 @@
+/* برای نمایش چک‌باکس‌ها در یک خط */
+.inline-checkbox {
+    display: inline-block;
+    margin-right: 20px; /* فاصله بین چک‌باکس‌ها */
+}
+
+/* برای نمایش فیلد هزینه مشترک در یک خط */
+.inline-fee {
+    display: inline-block;
+    width: auto !important;
+}
+
+/* برای گروه‌بندی فیلدهای مرتبط */
+.field-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* برای برچسب‌های چک‌باکس‌ها */
+.inline-checkbox + label {
+    display: inline-block;
+    margin-right: 20px;
+}

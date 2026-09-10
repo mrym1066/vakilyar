@@ -1,0 +1,51 @@
+{% load thumbnail %}
+{% load three_digits_currency %}
+
+<div class="col-sm-{{ col_size }}">
+    <div class="movakel-image-wrapper">
+        <div class="single-movakels">
+            <div class="movakelinfo text-center">
+                {% if movakel.image %}
+                    <img src="{{ movakel.image.url }}" alt="{{ movakel.name }}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid #E4E1D9;">
+
+                {% endif %}
+                
+                <h2>{{ movakel.name }}</h2>
+                <p><i class="fa fa-phone"></i> {{ movakel.mobile_number|default:"---" }}</p>
+                
+                {% if movakel.case_status == 'in_progress' %}
+                    <span class="badge badge-info">🔄 در جریان</span>
+                {% elif movakel.case_status == 'appeal' %}
+                    <span class="badge badge-warning">⚖️ تجدیدنظر</span>
+                {% elif movakel.case_status == 'execution' %}
+                    <span class="badge badge-danger">⚙️ اجرای حکم</span>
+                {% elif movakel.case_status == 'closed' %}
+                    <span class="badge badge-success">✅ مختومه</span>
+                {% elif movakel.case_status == 'archived' %}
+                    <span class="badge badge-secondary">📦 بایگانی</span>
+                {% else %}
+                    <span class="badge badge-info">🔄 در جریان</span>
+                {% endif %}
+            </div>
+
+            <div class="movakel-overlay">
+                <div class="overlay-content">
+                    <h2>{{ movakel.name }}</h2>
+                    <p>{{ movakel.mobile_number|default:"---" }}</p>
+                    <a href="{% url 'movakel-detail' movakel.slug %}" class="btn btn-overlay">مشاهده پرونده</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="choose">
+            <ul class="nav nav-pills nav-justified">
+                <li>
+                    <a href="{% url 'movakel-detail' movakel.slug %}" class="choose-link">
+                        <i class="fa fa-folder-open"></i>
+                        مشاهده جزئیات
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+{% extends 'shared/_layout.html' %}
+{% load widget_tweaks %}
+
+{% block title %}محاسبه خسارت{% endblock %}
+
+{% block content %}
+<section class="py-4" dir="rtl">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">⚖️ محاسبه‌گر خسارت تأخیر تأدیه</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">{{ field.label }}</label>
+                                    {{ field|add_class:"form-control" }}
+                                    {% if field.errors %}
+                                        <div class="text-danger small">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-warning w-100">محاسبه خسارت</button>
+                        </form>
+
+                        {% if result %}
+                            <div class="alert alert-success mt-4 text-center fs-5">
+                                <strong>نتیجه محاسبه:</strong><br>
+                                {{ result }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
