@@ -1,162 +1,332 @@
 {% extends 'shared/_layout.html' %}
+{% load common_tags %}
 
 {% block title %}تقویم جلسات دادگاه{% endblock %}
 
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i><span>خانه</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-calendar-check-o"></i><span>تقویم جلسات</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i><span>بازگشت</span>
+        </button>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4" dir="rtl">
-    <h4 class="mb-4">🏛️ تقویم جلسات دادگاه</h4>
+<section class="calendar-section">
+    <div class="container">
 
-    <!-- هشدار جلسات امروز -->
-    {% if today_count > 0 %}
-    <div class="alert alert-danger d-flex align-items-center mb-4">
-        <span class="fs-4 me-2">⚠️</span>
-        <div>
-            امروز <strong>{{ today_count }} جلسه</strong> دارید!
+        <!-- ═══ هدر صفحه ═══ -->
+        <div class="calendar-header">
+            <div class="calendar-header-info">
+                <div class="calendar-header-icon">
+                    <i class="fa fa-calendar-check-o"></i>
+                </div>
+                <div>
+                    <h1 class="calendar-title">تقویم جلسات دادگاه</h1>
+                    <p class="calendar-subtitle">
+                        مدیریت و مشاهده جلسات دادگاه پرونده‌ها
+                    </p>
+                </div>
+            </div>
         </div>
+
+        <!-- ═══ هشدار جلسات امروز ═══ -->
+        {% if today_count > 0 %}
+            <div class="alert-today">
+                <div class="alert-today-icon">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-today-text">
+                    <strong>توجه!</strong>
+                    امروز <strong>{{ today_count }} جلسه</strong> در دادگاه دارید.
+                </div>
+                <div class="alert-today-pulse"></div>
+            </div>
+        {% endif %}
+
+        <!-- ═══ کارت‌های آماری ═══ -->
+        <div class="calendar-stats">
+            <div class="stat-card stat-today">
+                <div class="stat-icon">
+                    <i class="fa fa-calendar-day"></i>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value">{{ today_count }}</div>
+                    <div class="stat-label">جلسات امروز</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-upcoming">
+                <div class="stat-icon">
+                    <i class="fa fa-calendar-plus-o"></i>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value">{{ upcoming_count }}</div>
+                    <div class="stat-label">جلسات آینده (۳۰ روز)</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-past">
+                <div class="stat-icon">
+                    <i class="fa fa-history"></i>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value">{{ past_hearings|length }}</div>
+                    <div class="stat-label">جلسات گذشته (۳۰ روز)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ تب‌ها ═══ -->
+        <div class="calendar-tabs-wrapper">
+            <ul class="nav nav-tabs calendar-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#tab-today" aria-controls="tab-today" role="tab" data-toggle="tab">
+                        <i class="fa fa-calendar-day"></i>
+                        <span>امروز</span>
+                        {% if today_count > 0 %}
+                            <span class="tab-badge tab-badge-danger">{{ today_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#tab-upcoming" aria-controls="tab-upcoming" role="tab" data-toggle="tab">
+                        <i class="fa fa-calendar-plus-o"></i>
+                        <span>آینده</span>
+                        {% if upcoming_count > 0 %}
+                            <span class="tab-badge tab-badge-primary">{{ upcoming_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#tab-past" aria-controls="tab-past" role="tab" data-toggle="tab">
+                        <i class="fa fa-history"></i>
+                        <span>گذشته</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content calendar-tab-content">
+
+                <!-- ═══ تب ۱: جلسات امروز ═══ -->
+                <div role="tabpanel" class="tab-pane fade in active" id="tab-today">
+                    {% if today_hearings %}
+                        <div class="table-responsive">
+                            <table class="table table-clean">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>نام موکل</th>
+                                        <th>شماره مکانیزه</th>
+                                        <th>زمان جلسه</th>
+                                        <th>شعبه بدوی</th>
+                                        <th class="no-print">عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in today_hearings %}
+                                        <tr class="row-today">
+                                            <td class="row-num">{{ forloop.counter }}</td>
+                                            <td>
+                                                <div class="user-cell">
+                                                    {% if m.image %}
+                                                        <img src="{{ m.image.url }}" alt="{{ m.name }}" class="user-avatar-sm">
+                                                    {% else %}
+                                                        <div class="user-avatar-sm avatar-fallback">{{ m.name|slice:":1" }}</div>
+                                                    {% endif %}
+                                                    <strong>{{ m.name }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if m.mechanized_number %}
+                                                    <span dir="ltr">{{ m.mechanized_number }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if m.hearing_time %}
+                                                    <span class="time-badge time-badge-danger">
+                                                        <i class="fa fa-clock-o"></i>
+                                                        {{ m.hearing_time|time:"H:i" }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ m.primary_branch|default:"—" }}</td>
+                                            <td class="row-edit-cell no-print">
+                                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-primary btn-xs">
+                                                    <i class="fa fa-eye"></i> مشاهده پرونده
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state-sm empty-success">
+                            <i class="fa fa-check-circle"></i>
+                            <h3>امروز جلسه‌ای ندارید</h3>
+                            <p>خدا رو شکر! امروز هیچ جلسه‌ای در دادگاه ندارید.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- ═══ تب ۲: جلسات آینده ═══ -->
+                <div role="tabpanel" class="tab-pane fade" id="tab-upcoming">
+                    {% if upcoming_hearings %}
+                        <div class="table-responsive">
+                            <table class="table table-clean">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>نام موکل</th>
+                                        <th>تاریخ جلسه</th>
+                                        <th>زمان</th>
+                                        <th>شعبه</th>
+                                        <th>مانده تا جلسه</th>
+                                        <th class="no-print">عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in upcoming_hearings %}
+                                        <tr>
+                                            <td class="row-num">{{ forloop.counter }}</td>
+                                            <td>
+                                                <div class="user-cell">
+                                                    {% if m.image %}
+                                                        <img src="{{ m.image.url }}" alt="{{ m.name }}" class="user-avatar-sm">
+                                                    {% else %}
+                                                        <div class="user-avatar-sm avatar-fallback">{{ m.name|slice:":1" }}</div>
+                                                    {% endif %}
+                                                    <strong>{{ m.name }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if m.hearing_date %}
+                                                    <span class="date-badge">
+                                                        <i class="fa fa-calendar"></i>
+                                                        {{ m.hearing_date|jalali_date }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if m.hearing_time %}
+                                                    <span class="time-badge">
+                                                        <i class="fa fa-clock-o"></i>
+                                                        {{ m.hearing_time|time:"H:i" }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ m.primary_branch|default:"—" }}</td>
+                                            <td>
+                                                {% with days_left=m.hearing_date|timeuntil %}
+                                                    <span class="countdown-badge">
+                                                        <i class="fa fa-hourglass-half"></i>
+                                                        {{ days_left }}
+                                                    </span>
+                                                {% endwith %}
+                                            </td>
+                                            <td class="row-edit-cell no-print">
+                                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-primary btn-xs">
+                                                    <i class="fa fa-eye"></i> مشاهده
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state-sm">
+                            <i class="fa fa-calendar-o"></i>
+                            <h3>جلسه‌ای در ۳۰ روز آینده نیست</h3>
+                            <p>هیچ جلسه‌ای در ۳۰ روز آینده ثبت نشده است.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- ═══ تب ۳: جلسات گذشته ═══ -->
+                <div role="tabpanel" class="tab-pane fade" id="tab-past">
+                    {% if past_hearings %}
+                        <div class="table-responsive">
+                            <table class="table table-clean">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>نام موکل</th>
+                                        <th>تاریخ جلسه</th>
+                                        <th>زمان</th>
+                                        <th>شعبه</th>
+                                        <th class="no-print">عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in past_hearings %}
+                                        <tr class="row-past">
+                                            <td class="row-num">{{ forloop.counter }}</td>
+                                            <td>
+                                                <div class="user-cell">
+                                                    {% if m.image %}
+                                                        <img src="{{ m.image.url }}" alt="{{ m.name }}" class="user-avatar-sm">
+                                                    {% else %}
+                                                        <div class="user-avatar-sm avatar-fallback">{{ m.name|slice:":1" }}</div>
+                                                    {% endif %}
+                                                    <strong>{{ m.name }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if m.hearing_date %}
+                                                    <span class="date-badge date-badge-past">
+                                                        <i class="fa fa-calendar"></i>
+                                                        {{ m.hearing_date|jalali_date }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ m.hearing_time|time:"H:i"|default:"—" }}</td>
+                                            <td>{{ m.primary_branch|default:"—" }}</td>
+                                            <td class="row-edit-cell no-print">
+                                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-secondary btn-xs">
+                                                    <i class="fa fa-eye"></i> مشاهده
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state-sm">
+                            <i class="fa fa-folder-o"></i>
+                            <h3>جلسه‌ای در ۳۰ روز گذشته نیست</h3>
+                            <p>هیچ جلسه‌ای در ۳۰ روز گذشته ثبت نشده است.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
     </div>
-    {% endif %}
-
-    <!-- تب‌ها -->
-    <ul class="nav nav-tabs mb-3" id="hearingTabs">
-        <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#today">
-                امروز
-                {% if today_count > 0 %}
-                <span class="badge bg-danger">{{ today_count }}</span>
-                {% endif %}
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#upcoming">
-                آینده
-                <span class="badge bg-primary">{{ upcoming_count }}</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#past">گذشته</a>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-
-        <!-- جلسات امروز -->
-        <div class="tab-pane fade show active" id="today">
-            {% if today_hearings %}
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-danger">
-                        <tr>
-                            <th>نام موکل</th>
-                            <th>شماره مکانیزه</th>
-                            <th>زمان جلسه</th>
-                            <th>شعبه بدوی</th>
-                            <th>عملیات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for m in today_hearings %}
-                        <tr>
-                            <td>{{ m.name }}</td>
-                            <td>{{ m.mechanized_number|default:"-" }}</td>
-                            <td>
-                                {% if m.hearing_time %}
-                                    <span class="badge bg-danger">{{ m.hearing_time }}</span>
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>{{ m.primary_branch|default:"-" }}</td>
-                            <td>
-                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-primary">مشاهده پرونده</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-5 text-muted">
-                <p class="fs-5">✅ امروز جلسه‌ای ندارید</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- جلسات آینده -->
-        <div class="tab-pane fade" id="upcoming">
-            {% if upcoming_hearings %}
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>نام موکل</th>
-                            <th>تاریخ جلسه</th>
-                            <th>زمان</th>
-                            <th>شعبه</th>
-                            <th>مانده تا جلسه</th>
-                            <th>عملیات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for m in upcoming_hearings %}
-                        <tr>
-                            <td>{{ m.name }}</td>
-                            <td>{{ m.hearing_date }}</td>
-                            <td>{{ m.hearing_time|default:"-" }}</td>
-                            <td>{{ m.primary_branch|default:"-" }}</td>
-                            <td>
-                                {% with days_left=m.hearing_date|timeuntil %}
-                                <span class="badge bg-info text-dark">{{ days_left }}</span>
-                                {% endwith %}
-                            </td>
-                            <td>
-                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-primary">مشاهده</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-5 text-muted">
-                <p class="fs-5">📅 جلسه‌ای در ۳۰ روز آینده ثبت نشده</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- جلسات گذشته -->
-        <div class="tab-pane fade" id="past">
-            {% if past_hearings %}
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-secondary">
-                        <tr>
-                            <th>نام موکل</th>
-                            <th>تاریخ جلسه</th>
-                            <th>زمان</th>
-                            <th>عملیات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for m in past_hearings %}
-                        <tr class="text-muted">
-                            <td>{{ m.name }}</td>
-                            <td>{{ m.hearing_date }}</td>
-                            <td>{{ m.hearing_time|default:"-" }}</td>
-                            <td>
-                                <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-secondary">مشاهده</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-5 text-muted">
-                <p class="fs-5">📂 جلسه‌ای در ۳۰ روز گذشته ثبت نشده</p>
-            </div>
-            {% endif %}
-        </div>
-
-    </div>
-</div>
+</section>
 {% endblock %}

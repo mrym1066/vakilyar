@@ -1,119 +1,118 @@
 {% extends 'shared/_layout.html' %}
-{% load render_partial %}
-{% load poll_extras %}
-{% load jalali_tags %}
-{% load jalali_filters %}
-{% load humanize %}
+{% load static %}
+{% load common_tags %}
+
 {% block title %}
-    {{ movakel.title }}
+    {{ doc.subject }} — متن لایحه
 {% endblock %}
 
 {% block header_references %}
-    <link href="/static/lib/image-lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="{% static 'lib/image-lightbox/css/lightbox.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block footer_references %}
-    <script src="/static/lib/image-lightbox/js/lightbox.min.js"></script>
-    {#    <script src="/static/lib/image-lightbox/js/lightbox-plus-jquery.min.js"></script>#}
+    <script src="{% static 'lib/image-lightbox/js/lightbox.min.js' %}"></script>
 {% endblock %}
+
 {% block content %}
-    <style>
-
-       
-        
-        h2 {
-            color: #2c3e50;
-            font-size: 22px;
-        }
-        
-        p {
-            font-size: 16px;
-            color: #333;
-            margin: 10px 0;
-        }
-        
-        pre.document-content {
-            background: #fff;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            white-space: pre-wrap;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-        
-        .download-btn, .print-btn, .close-btn {
-            display: inline-block;
-            margin: 10px 5px;
-            padding: 10px 15px;
-            font-size: 16px;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        
-        .download-btn {
-            background: #3498db;
-            color: white;
-        }
-        
-        .download-btn:hover {
-            background: #2980b9;
-        }
-        
-        .print-btn {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .print-btn:hover {
-            background: #219150;
-        }
-        
-        .close-btn {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .close-btn:hover {
-            background: #c0392b;
-        }
-        
-        .print-section {
-            margin: 15px 0;
-            text-align: center;
-        }
-        
-    </style>
-
-   
+<section class="defense-doc-section">
     <div class="container">
-        <h2>موضوع: {{ doc.subject }}</h2>
-        <p><strong>مرحله:</strong> {{ doc.get_stage_display }}</p>
-        <p><strong>تاریخ ثبت:</strong> {{ doc.created_at|date:"Y/m/d" }}</p>
-        
-        <h3>متن لایحه:</h3>
-        <h4 class="document-content" id="printable-content">{{ doc.content }}</h4>
-        
-        <div class="print-section">
-            <button onclick="printDocument()" class="print-btn">چاپ متن لایحه</button>
-            <a href="{% url 'download_document_word' doc.pk %}" class="download-btn">دانلود متن لایحه</a>
-            <a href="javascript:window.close();" class="close-btn">بستن صفحه</a>
-    
+
+        <!-- ═══ کارت اصلی ═══ -->
+        <div class="defense-doc-card">
+
+            <!-- هدر -->
+            <div class="defense-doc-header">
+                <div class="defense-doc-header-icon">
+                    <i class="fa fa-file-text-o"></i>
+                </div>
+                <div class="defense-doc-header-text">
+                    <h1>{{ doc.subject|default:"لایحه دفاعیه" }}</h1>
+                    <p>
+                        <i class="fa fa-user"></i>
+                        <span>{{ doc.movakel.name|default:"—" }}</span>
+                        {% if doc.movakel.mechanized_number %}
+                            <span class="divider">|</span>
+                            <i class="fa fa-hashtag"></i>
+                            <span dir="ltr">{{ doc.movakel.mechanized_number }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- اطلاعات متا -->
+            <div class="defense-doc-meta">
+                <div class="defense-meta-item">
+                    <i class="fa fa-flag-o"></i>
+                    <span>
+                        <span class="meta-label">مرحله:</span>
+                        <span class="meta-value">{{ doc.get_stage_display|default:"—" }}</span>
+                    </span>
+                </div>
+                <div class="defense-meta-item">
+                    <i class="fa fa-calendar"></i>
+                    <span>
+                        <span class="meta-label">تاریخ ثبت:</span>
+                        <span class="meta-value">{{ doc.created_at|date:"Y/m/d" }}</span>
+                    </span>
+                </div>
+                {% if doc.updated_at %}
+                    <div class="defense-meta-item">
+                        <i class="fa fa-refresh"></i>
+                        <span>
+                            <span class="meta-label">آخرین ویرایش:</span>
+                            <span class="meta-value">{{ doc.updated_at|date:"Y/m/d" }}</span>
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- محتوای لایحه -->
+            <div class="defense-doc-content-wrapper">
+                <h2 class="defense-doc-content-title">
+                    <i class="fa fa-align-right"></i>
+                    متن لایحه
+                </h2>
+                <div class="document-content"
+                     id="printable-content"
+                     data-subject="{{ doc.subject|default:'لایحه دفاعیه' }}"
+                     data-movakel="{{ doc.movakel.name|default:'' }}"
+                     data-stage="{{ doc.get_stage_display|default:'' }}"
+                     data-date="{{ doc.created_at|date:'Y/m/d' }}">
+                    {{ doc.content|default:"متنی ثبت نشده است." }}
+                </div>
+            </div>
+
+            <!-- دکمه‌ها -->
+            <div class="defense-doc-actions no-print">
+                <button type="button"
+                        id="btn-print-document"
+                        class="defense-btn defense-btn-print">
+                    <i class="fa fa-print"></i>
+                    چاپ متن لایحه
+                </button>
+                <a href="{% url 'download_document_word' doc.pk %}"
+                   class="defense-btn defense-btn-download">
+                    <i class="fa fa-download"></i>
+                    دانلود Word
+                </a>
+                {% if doc.movakel %}
+                    <a href="{% url 'movakel-detail' doc.movakel.slug %}"
+                       class="defense-btn defense-btn-close">
+                        <i class="fa fa-arrow-right"></i>
+                        بازگشت به پرونده
+                    </a>
+                {% else %}
+                    <button type="button"
+                            onclick="history.back()"
+                            class="defense-btn defense-btn-close">
+                        <i class="fa fa-arrow-right"></i>
+                        بازگشت
+                    </button>
+                {% endif %}
+            </div>
+
         </div>
     </div>
-    
-    <script>
-    function printDocument() {
-        var printContents = document.getElementById("printable-content").innerHTML;
-        var originalContents = document.body.innerHTML;
-    
-        document.body.innerHTML = "<pre>" + printContents + "</pre>";
-        window.print();
-        document.body.innerHTML = originalContents;
-    }
-    </script>
-    
+</section>
 {% endblock %}

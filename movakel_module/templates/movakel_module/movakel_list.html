@@ -1,56 +1,194 @@
-{% extends 'shared/_layout.html' %}
-{% load thumbnail %}
-{% load render_partial %}
-{% load jalali_tags %}
 
-{% block title %}لیست پرونده ها{% endblock %}
+{% extends 'shared/_layout.html' %}
+{% load static %}
+{% load humanize %}
+{% load common_tags %}
+
+{% block title %}لیست پرونده‌ها{% endblock %}
 
 {% block content %}
-<section>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-9 padding-right">
-                {% if categorized_movakels %}
-                    {% for year, movakels in categorized_movakels.items %}
-                        <h2 class="title">پرونده‌های سال {{ year }}</h2>
-                        <div class="features_items row">
-                            {% for movakel in movakels %}
-                                {% include 'movakel_module/includes/movakel_item_partial.html' with movakel=movakel col_size=4 %}
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
+<section class="movakel-list-page">
+    <div class="ml-container">
+
+        <!-- ===== Breadcrumb ===== -->
+        <nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+            <div class="ml-breadcrumb-inner">
+                <ol class="breadcrumb">
+                    <li>
+                        <a href="{% url 'movakel-list' %}">
+                            <i class="fa fa-home"></i>
+                            <span>خانه</span>
+                        </a>
+                    </li>
+                    <li class="active">
                         <i class="fa fa-folder-open"></i>
-                        <p>هیچ پرونده‌ای یافت نشد</p>
-                    </div>
-                {% endif %}
+                        <span>پرونده‌ها</span>
+                    </li>
+                </ol>
+                <div class="ml-breadcrumb-actions">
+                    <a href="{% url 'advanced_search' %}" class="ml-btn-outline">
+                        <i class="fa fa-sliders"></i>
+                        <span>جستجوی پیشرفته</span>
+                    </a>
+                    <a href="{% url 'request_meeting' %}" class="ml-btn-new">
+                        <i class="fa fa-plus"></i>
+                        <span>پرونده جدید</span>
+                    </a>
+                </div>
             </div>
+        </nav>
 
-            <div class="col-sm-3">
-                <div class="left-sidebar">
-                    <h2>دسته‌بندی پرونده‌ها</h2>
-                    <ul class="category-list">
-                        {% for category in category_list %}
-                            <li>
-                                {{ category.name }}
-                                <span class="category-count">{{ category.count }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-
-                    <form action="" method="get" id="filter_form">
-                        <input type="hidden" name="page" id="page" value="{{ page_obj.number }}">
-                        <input type="hidden" name="start_total_amount" id="start_total_amount" value="{{ start_total_amount }}">
-                        <input type="hidden" name="end_total_amount" id="end_total_amount" value="{{ end_total_amount }}">
-                    </form>
-                    <button class="btn btn-primary btn-block" onclick="filterMovakels()" style="margin-top:14px;">
-                        <i class="fa fa-filter"></i> فیلتر
-                    </button>
+        <!-- ===== هدر سرمه‌ای ===== -->
+        <div class="ml-header">
+            <div class="ml-header-info">
+                <div class="ml-header-icon">
+                    <i class="fa fa-folder-open"></i>
+                </div>
+                <div class="ml-header-text">
+                    <h1>لیست پرونده‌ها</h1>
+                    <p>
+                        <i class="fa fa-info-circle"></i>
+                        مدیریت و مشاهده پرونده‌های حقوقی
+                    </p>
                 </div>
             </div>
 
+         <!--<div class="ml-header-stats">
+                <div class="ml-stat">
+                    <i class="fa fa-folder"></i>
+                    <div>
+                        <strong>{{ total_movakels|default:movakels|length }}</strong>
+                        <span>پرونده</span>
+                    </div>
+                </div>
+            </div>-->
         </div>
+
+        <!-- ===== پیام‌ها ===== -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-custom alert-custom-{{ message.tags }}">
+                    <i class="fa fa-info-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- ===== Layout: Sidebar + Content ===== -->
+        <div class="row ml-row">
+
+            <!-- سایدبار -->
+            <div class="col-md-3 col-sm-4 ml-sidebar-col">
+                <aside class="ml-sidebar no-print">
+                    <!-- ═══ دسته‌بندی‌ها ═══ -->
+                    {% include 'movakel_module/components/movakel_categories_component.html' %}
+                                        <!-- ═══ انواع پرونده ═══
+                    {% include 'movakel_module/components/movakel_types_component.html' %}-->
+                    <!-- فیلتر مبلغ 
+                    <div class="ml-sidebar-widget">
+                        <h3 class="ml-widget-title">
+                            <i class="fa fa-filter"></i>
+                            فیلتر مبلغ حق‌الوکاله
+                        </h3>
+                        <form method="get" action="" class="ml-sidebar-form">
+                            <div class="ml-sidebar-field">
+                                <label>از مبلغ (تومان)</label>
+                                <input type="number" name="start_total_amount"
+                                       value="{{ start_total_amount|default:'' }}"
+                                       placeholder="مثلاً 1000000"
+                                       class="ml-sidebar-input">
+                            </div>
+                            <div class="ml-sidebar-field">
+                                <label>تا مبلغ (تومان)</label>
+                                <input type="number" name="end_total_amount"
+                                       value="{{ end_total_amount|default:'' }}"
+                                       placeholder="مثلاً 50000000"
+                                       class="ml-sidebar-input">
+                            </div>
+                            <button type="submit" class="ml-sidebar-btn">
+                                <i class="fa fa-search"></i>
+                                <span>اعمال فیلتر</span>
+                            </button>
+                            {% if start_total_amount or end_total_amount %}
+                                <a href="{% url 'movakel-list' %}" class="ml-sidebar-reset">
+                                    <i class="fa fa-times"></i>
+                                    پاک کردن فیلتر
+                                </a>
+                            {% endif %}
+                        </form>
+                    </div>-->
+                </aside>
+            </div>
+
+            <!-- محتوای اصلی -->
+            <div class="col-md-9 col-sm-8 ml-content-col">
+
+                {% if categorized_movakels %}
+                    {% for year, movakels in categorized_movakels.items %}
+                        <div class="ml-year-section">
+                            <div class="ml-year-header">
+                                <h2 class="ml-year-title">
+                                    <i class="fa fa-calendar"></i>
+                                    پرونده‌های سال {{ year }}
+                                </h2>
+                                <span class="ml-year-count">
+                                    {{ movakels|length }} پرونده
+                                </span>
+                            </div>
+
+                            <div class="ml-grid">
+                                {% for movakel in movakels %}
+                                    {% include 'movakel_module/includes/movakel_item_partial.html' with movakel=movakel %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- حالت خالی -->
+                    <div class="ml-empty">
+                        <div class="ml-empty-icon">
+                            <i class="fa fa-folder-open-o"></i>
+                        </div>
+                        <h3>هیچ پرونده‌ای یافت نشد</h3>
+                        <p>
+                            {% if start_total_amount or end_total_amount %}
+                                با فیلترهای اعمال‌شده پرونده‌ای پیدا نشد.
+                                <a href="{% url 'movakel-list' %}">پاک کردن فیلترها</a>
+                            {% else %}
+                                هنوز هیچ پرونده‌ای ثبت نشده است.
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+
+                <!-- صفحه‌بندی -->
+                {% if is_paginated %}
+                    <nav class="ml-pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.start_total_amount %}&start_total_amount={{ request.GET.start_total_amount }}{% endif %}{% if request.GET.end_total_amount %}&end_total_amount={{ request.GET.end_total_amount }}{% endif %}"
+                               class="ml-page-link">
+                                <i class="fa fa-chevron-right"></i>
+                                قبلی
+                            </a>
+                        {% endif %}
+
+                        <span class="ml-page-info">
+                            صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.start_total_amount %}&start_total_amount={{ request.GET.start_total_amount }}{% endif %}{% if request.GET.end_total_amount %}&end_total_amount={{ request.GET.end_total_amount }}{% endif %}"
+                               class="ml-page-link">
+                                بعدی
+                                <i class="fa fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+
+            </div>
+        </div>
+
     </div>
 </section>
 {% endblock %}

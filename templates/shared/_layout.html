@@ -4,35 +4,108 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="description" content="سامانه مدیریت پرونده وکیل‌یار">
+    <meta name="description" content="{% block meta_description %}سامانه مدیریت پرونده وکیل‌یار{% endblock %}">
     <meta name="author" content="vakilyar">
+    <meta name="theme-color" content="#1B2A4A">
     <title>{% block title %}{% endblock %} | وکیل‌یار</title>
+
     {% include 'shared/header_references.html' %}
     {% block header_references %}{% endblock %}
+
     <style>
         @media print {
-            html, body {
-                margin: 0;
-                padding: 0;
-            }
-            @page {
-                margin: 0;
-            }
-            /* مخفی کردن بخش‌هایی که نمی‌خواهیم چاپ شوند */
-            .no-print, .user-account, .user-menu, header, footer, nav { 
+            html, body { margin: 0; padding: 0; }
+            @page { margin: 1.5cm; }
+            .no-print, .user-account, .user-menu, header, footer, nav,
+            .case-header-actions, .case-status-form, .btn, .pagination {
                 display: none !important;
             }
+            body { background: white !important; color: black !important; }
+            a { color: #000 !important; text-decoration: underline; }
+            a[href]::after {
+                content: " (" attr(href) ")";
+                font-size: 9pt;
+                color: #666;
+            }
+            table { box-shadow: none !important; border: 1px solid #ccc !important; }
+            tr { page-break-inside: avoid; }
+            h1, h2, h3 { page-break-after: avoid; }
         }
-        </style>
+    </style>
 </head>
 <body>
 {% render_partial 'movakel_module.views.site_header_component' %}
-{% block content %}{% endblock %}
-{% render_partial 'movakel_module.views.site_footer_component' %}
-<div class="no-print">
-    {% include 'shared/footer_references.html' %}
-</div>
 
+    <!-- ═══ Breadcrumb (پیش‌فرض) ═══ -->
+    {% block breadcrumb %}
+    {% with url_name=request.resolver_match.url_name %}
+    <nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li>
+                    <a href="{% url 'movakel-list' %}">
+                        <i class="fa fa-home"></i>
+                        <span>خانه</span>
+                    </a>
+                </li>
+
+                {# پرونده‌ها #}
+                {% if url_name == 'movakel-list' or url_name == 'movakel-categories-list' %}
+                    <li class="active"><i class="fa fa-folder-open"></i><span>پرونده‌ها</span></li>
+                {% elif url_name == 'movakel-detail' %}
+                    <li><a href="{% url 'movakel-list' %}"><i class="fa fa-folder-open"></i><span>پرونده‌ها</span></a></li>
+                    <li class="active"><i class="fa fa-user"></i><span>{{ movakel.name|default:"جزئیات پرونده" }}</span></li>
+
+                {# ملاقات‌ها #}
+                {% elif url_name == 'meeting_list' or url_name == 'request_meeting' %}
+                    <li class="active"><i class="fa fa-calendar"></i><span>ملاقات‌ها</span></li>
+
+                {# مقالات #}
+                {% elif url_name == 'articles_list' or url_name == 'articles_by_category_list' %}
+                    <li class="active"><i class="fa fa-newspaper-o"></i><span>مقالات</span></li>
+                {% elif url_name == 'articles_detail' %}
+                    <li><a href="{% url 'articles_list' %}"><i class="fa fa-newspaper-o"></i><span>مقالات</span></a></li>
+                    <li class="active"><i class="fa fa-file-text"></i><span>{{ article.title|default:"جزئیات مقاله"|truncatechars:30 }}</span></li>
+
+                {# پنل کاربری #}
+                {% elif url_name == 'user_panel_dashboard' %}
+                    <li class="active"><i class="fa fa-dashboard"></i><span>پنل کاربری</span></li>
+                {% elif url_name == 'edit_profile_page' %}
+                    <li><a href="{% url 'user_panel_dashboard' %}"><i class="fa fa-dashboard"></i><span>پنل کاربری</span></a></li>
+                    <li class="active"><i class="fa fa-pencil"></i><span>ویرایش پروفایل</span></li>
+                {% elif url_name == 'change_password_page' %}
+                    <li><a href="{% url 'user_panel_dashboard' %}"><i class="fa fa-dashboard"></i><span>پنل کاربری</span></a></li>
+                    <li class="active"><i class="fa fa-lock"></i><span>تغییر رمز</span></li>
+
+                {# پرداخت‌ها #}
+                {% elif url_name == 'payment_details' %}
+                    <li><a href="{% url 'movakel-list' %}"><i class="fa fa-folder-open"></i><span>پرونده‌ها</span></a></li>
+                    <li class="active"><i class="fa fa-money"></i><span>پرداخت‌ها</span></li>
+
+                {# پیش‌فرض #}
+                {% else %}
+                    <li class="active"><i class="fa fa-folder-open"></i><span>پرونده‌ها</span></li>
+                {% endif %}
+            </ol>
+
+            <button type="button" class="btn-back" onclick="history.back()">
+                <i class="fa fa-arrow-right"></i>
+                <span>بازگشت</span>
+            </button>
+        </div>
+    </nav>
+    {% endwith %}
+    {% endblock %}
+
+    <main id="main-content" role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% render_partial 'movakel_module.views.site_footer_component' %}
+
+    <div class="no-print">
+        {% include 'shared/footer_references.html' %}
+    </div>
     {% block footer_references %}{% endblock %}
 </body>
 </html>

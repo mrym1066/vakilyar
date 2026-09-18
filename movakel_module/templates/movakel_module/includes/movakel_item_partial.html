@@ -1,51 +1,83 @@
-{% load thumbnail %}
-{% load three_digits_currency %}
+{% load humanize %}
+{% load common_tags %}
 
-<div class="col-sm-{{ col_size }}">
-    <div class="movakel-image-wrapper">
-        <div class="single-movakels">
-            <div class="movakelinfo text-center">
+<div class="ml-card-item">
+    <a href="{% url 'movakel-detail' movakel.slug %}" class="ml-card-link">
+
+        <!-- بخش بالایی: آواتار و اطلاعات -->
+        <div class="ml-card-top">
+            <div class="ml-card-avatar-wrapper">
                 {% if movakel.image %}
-                    <img src="{{ movakel.image.url }}" alt="{{ movakel.name }}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid #E4E1D9;">
-
-                {% endif %}
-                
-                <h2>{{ movakel.name }}</h2>
-                <p><i class="fa fa-phone"></i> {{ movakel.mobile_number|default:"---" }}</p>
-                
-                {% if movakel.case_status == 'in_progress' %}
-                    <span class="badge badge-info">🔄 در جریان</span>
-                {% elif movakel.case_status == 'appeal' %}
-                    <span class="badge badge-warning">⚖️ تجدیدنظر</span>
-                {% elif movakel.case_status == 'execution' %}
-                    <span class="badge badge-danger">⚙️ اجرای حکم</span>
-                {% elif movakel.case_status == 'closed' %}
-                    <span class="badge badge-success">✅ مختومه</span>
-                {% elif movakel.case_status == 'archived' %}
-                    <span class="badge badge-secondary">📦 بایگانی</span>
+                    <img src="{{ movakel.image.url }}"
+                         alt="{{ movakel.name }}"
+                         class="ml-card-avatar">
                 {% else %}
-                    <span class="badge badge-info">🔄 در جریان</span>
+                    <div class="ml-card-avatar-fallback">
+                        {{ movakel.name|slice:":1" }}
+                    </div>
                 {% endif %}
             </div>
 
-            <div class="movakel-overlay">
-                <div class="overlay-content">
-                    <h2>{{ movakel.name }}</h2>
-                    <p>{{ movakel.mobile_number|default:"---" }}</p>
-                    <a href="{% url 'movakel-detail' movakel.slug %}" class="btn btn-overlay">مشاهده پرونده</a>
-                </div>
+            <div class="ml-card-info">
+                <h3 class="ml-card-name">{{ movakel.name }}</h3>
+                {% if movakel.mobile_number %}
+                    <p class="ml-card-phone">
+                        <i class="fa fa-phone"></i>
+                        <span dir="ltr">{{ movakel.mobile_number }}</span>
+                    </p>
+                {% endif %}
+                {% if movakel.mechanized_number %}
+                    <p class="ml-card-code">
+                        <i class="fa fa-hashtag"></i>
+                        <span dir="ltr">{{ movakel.mechanized_number }}</span>
+                    </p>
+                {% endif %}
             </div>
         </div>
 
-        <div class="choose">
-            <ul class="nav nav-pills nav-justified">
-                <li>
-                    <a href="{% url 'movakel-detail' movakel.slug %}" class="choose-link">
-                        <i class="fa fa-folder-open"></i>
-                        مشاهده جزئیات
-                    </a>
-                </li>
-            </ul>
+        <!-- بخش میانی: وضعیت و دسته -->
+        <div class="ml-card-middle">
+            {% if movakel.category %}
+                <span class="ml-card-tag">
+                    <i class="fa fa-tag"></i>
+                    {{ movakel.category }}
+                </span>
+            {% endif %}
+
+            {% if movakel.case_status == 'in_progress' %}
+                <span class="ml-card-status status-progress">
+                    <i class="fa fa-refresh"></i> در جریان
+                </span>
+            {% elif movakel.case_status == 'appeal' %}
+                <span class="ml-card-status status-appeal">
+                    <i class="fa fa-balance-scale"></i> تجدیدنظر
+                </span>
+            {% elif movakel.case_status == 'execution' %}
+                <span class="ml-card-status status-execution">
+                    <i class="fa fa-cogs"></i> اجرای حکم
+                </span>
+            {% elif movakel.case_status == 'closed' %}
+                <span class="ml-card-status status-closed">
+                    <i class="fa fa-check"></i> مختومه
+                </span>
+            {% elif movakel.case_status == 'archived' %}
+                <span class="ml-card-status status-archived">
+                    <i class="fa fa-archive"></i> بایگانی
+                </span>
+            {% else %}
+                <span class="ml-card-status status-progress">
+                    <i class="fa fa-refresh"></i> در جریان
+                </span>
+            {% endif %}
         </div>
-    </div>
+
+        <!-- بخش پایین: دکمه -->
+        <div class="ml-card-footer">
+            <span class="ml-card-btn">
+                <i class="fa fa-arrow-left"></i>
+                مشاهده پرونده
+            </span>
+        </div>
+
+    </a>
 </div>

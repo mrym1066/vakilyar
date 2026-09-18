@@ -3,40 +3,152 @@
 
 {% block title %}محاسبه خسارت{% endblock %}
 
-{% block content %}
-<section class="py-4" dir="rtl">
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-7">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0">⚖️ محاسبه‌گر خسارت تأخیر تأدیه</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST">
-                            {% csrf_token %}
-                            {% for field in form %}
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">{{ field.label }}</label>
-                                    {{ field|add_class:"form-control" }}
-                                    {% if field.errors %}
-                                        <div class="text-danger small">{{ field.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                            <button type="submit" class="btn btn-warning w-100">محاسبه خسارت</button>
-                        </form>
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-folder-open"></i>
+                    <span>پرونده‌ها</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-calculator"></i>
+                <span>محاسبه خسارت</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i>
+            <span>بازگشت</span>
+        </button>
+    </div>
+</nav>
+{% endblock %}
 
-                        {% if result %}
-                            <div class="alert alert-success mt-4 text-center fs-5">
-                                <strong>نتیجه محاسبه:</strong><br>
-                                {{ result }}
-                            </div>
-                        {% endif %}
-                    </div>
+{% block content %}
+<section class="calculate-damage-section">
+    <div class="container">
+
+        <!-- ═══ هدر صفحه ═══ -->
+        <div class="calc-header">
+            <div class="calc-header-info">
+                <div class="calc-header-icon">
+                    <i class="fa fa-calculator"></i>
+                </div>
+                <div>
+                    <h1 class="calc-title">محاسبه‌گر خسارت تأخیر تأدیه</h1>
+                    <p class="calc-subtitle">
+                        محاسبه دقیق خسارت تأخیر تأدیه طبق قانون و نرخ تورم
+                    </p>
                 </div>
             </div>
         </div>
+
+        <!-- ═══ کارت اصلی ═══ -->
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-sm-10 col-xs-12">
+
+                <div class="calc-card">
+
+                    <!-- هدر کارت -->
+                    <div class="calc-card-header">
+                        <i class="fa fa-balance-scale"></i>
+                        <h3>اطلاعات محاسبه</h3>
+                    </div>
+
+                    <!-- بدنه کارت -->
+                    <div class="calc-card-body">
+
+                        <form method="POST" class="calc-form">
+                            {% csrf_token %}
+
+                            {% for field in form %}
+                                <div class="calc-field">
+                                    <label for="{{ field.id_for_label }}">
+                                        <i class="fa fa-circle-o"></i>
+                                        {{ field.label }}
+                                        {% if field.field.required %}
+                                            <span class="required">*</span>
+                                        {% endif %}
+                                    </label>
+
+                                    {{ field|add_class:"form-control" }}
+
+                                    {% if field.help_text %}
+                                        <div class="form-hint">
+                                            <i class="fa fa-info-circle"></i>
+                                            {{ field.help_text }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        <div class="field-error">
+                                            <i class="fa fa-exclamation-triangle"></i>
+                                            {% for error in field.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            <div class="calc-form-actions">
+                                <button type="submit" class="btn-calc-submit">
+                                    <i class="fa fa-calculator"></i>
+                                    <span>محاسبه خسارت</span>
+                                </button>
+                                <a href="{% url 'calculate_damage' %}" class="btn-calc-reset">
+                                    <i class="fa fa-refresh"></i>
+                                    <span>پاک کردن فرم</span>
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- ═══ نتیجه محاسبه ═══ -->
+                        {% if result %}
+                            <div class="calc-result">
+                                <div class="calc-result-icon">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                                <div class="calc-result-content">
+                                    <h4>نتیجه محاسبه</h4>
+                                    <div class="calc-result-value">
+                                        {{ result }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- ═══ باکس راهنما ═══ -->
+                <div class="calc-info-box">
+                    <div class="info-icon">
+                        <i class="fa fa-lightbulb-o"></i>
+                    </div>
+                    <div class="info-content">
+                        <strong>راهنمای محاسبه:</strong>
+                        <ul>
+                            <li>مبلغ اصلی بدهی را به تومان وارد کنید.</li>
+                            <li>تاریخ سررسید و تاریخ پرداخت را دقیق وارد کنید.</li>
+                            <li>نرخ تورم بر اساس اعلام بانک مرکزی محاسبه می‌شود.</li>
+                            <li>خسارت تأخیر تأدیه شامل سود قانونی و تورم محاسبه می‌گردد.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 </section>
 {% endblock %}

@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-import secrets
 
 try:
     from dotenv import load_dotenv
@@ -11,19 +10,22 @@ except ImportError:
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ===================== امنیت =====================
-_secret = os.environ.get('SECRET_KEY', '')
-if not _secret:
-    # در محیط dev یک کلید موقت تولید می‌شود — در production حتماً env باید تنظیم شود
-    import warnings
-    warnings.warn(
-        "SECRET_KEY در environment تنظیم نشده! برای production فایل .env را ایجاد کنید.",
-        RuntimeWarning
-    )
-    _secret = secrets.token_urlsafe(50)
+# SECRET_KEY از فایل .env خوانده می‌شود.
+# اگر .env وجود نداشت (مثلاً اولین بار نصب)، مقدار پیش‌فرض زیر استفاده می‌شود.
+# برای نصب روی هر سیستم جدید، یک فایل .env با SECRET_KEY اختصاصی بسازید.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'Pnd9Q7KG6d7RL1dnX9w1NuT3dfsXYe3wB0hfQCbrzlQUPBsGE6st0b6A4F60mWB5Xf8'
+)
 
-SECRET_KEY = _secret
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# برای نصب روی شبکه محلی (LAN)، IP دستگاه سرور را اینجا اضافه کنید
+# مثال: ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.10']
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS', 'localhost,127.0.0.1'
+).split(',')
+
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -74,7 +76,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # تنظیمات سایت در همه تمپلیت‌ها
                 'site_module.context_processors.site_setting',
             ],
         },
@@ -120,15 +121,15 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ایمیل
+# ایمیل — از .env خوانده می‌شود
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'onionarchitecturemvc@gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = 587
 
-# Logging — ساخت خودکار پوشه logs اگر وجود نداشت
+# Logging
 LOGS_DIR = BASE_DIR / 'logs'
 LOGS_DIR.mkdir(exist_ok=True)
 
@@ -171,9 +172,9 @@ from django.contrib.messages import constants as messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 MESSAGE_TAGS = {
     messages.SUCCESS: 'alert-success',
-    messages.INFO: 'alert-info',
+    messages.INFO:    'alert-info',
     messages.WARNING: 'alert-warning',
-    messages.ERROR: 'alert-danger',
+    messages.ERROR:   'alert-danger',
 }
 
 # Jalali
@@ -192,10 +193,6 @@ JALALI_DATE_DEFAULTS = {
     },
 }
 
-
-
-# ── انتهای settings.py اضافه کنید ──
-
 JAZZMIN_SETTINGS = {
     "site_title": "وکیل‌یار",
     "site_header": "وکیل‌یار",
@@ -209,26 +206,18 @@ JAZZMIN_SETTINGS = {
     "search_model": [],
     "user_avatar": None,
     "language_chooser": False,
-
-    # منوی بالا
     "topmenu_links": [
         {"name": "🏠 صفحه اصلی سایت", "url": "/", "new_window": True},
         {"name": "📁 پرونده‌ها", "url": "/movakels/", "new_window": False},
         {"name": "📅 ملاقات‌ها", "url": "/movakels/meetings/", "new_window": False},
     ],
-
-    # منوی کاربر
     "usermenu_links": [
         {"name": " مشاهده سایت", "url": "/", "new_window": True},
     ],
-
-    # سایدبار
     "show_sidebar": True,
     "navigation_expanded": False,
     "hide_apps": [],
     "hide_models": [],
-
-    # ترتیب منوی سایدبار
     "order_with_respect_to": [
         "movakel_module",
         "auth",
@@ -236,8 +225,6 @@ JAZZMIN_SETTINGS = {
         "contact_module",
         "site_module",
     ],
-
-    # آیکون‌ها
     "icons": {
         "auth":                              "fas fa-shield-alt",
         "auth.user":                         "fas fa-user-tie",
@@ -262,10 +249,8 @@ JAZZMIN_SETTINGS = {
         "site_module":                       "fas fa-cog",
         "site_module.sitesetting":           "fas fa-sliders-h",
     },
-
     "default_icon_parents":  "fas fa-chevron-circle-left",
     "default_icon_children": "fas fa-dot-circle",
-
     "related_modal_active": True,
     "custom_css":           "css/jazzmin_custom.css",
     "custom_js":            "js/sidebar_mobile.js",
@@ -279,28 +264,21 @@ JAZZMIN_SETTINGS = {
     "changeform_format_overrides": {
         "auth.user":  "collapsible",
         "auth.group": "vertical_tabs",
-        
     },
 }
+
 JAZZMIN_UI_TWEAKS = {
-    # نوار بالا
     "navbar_small_text":  False,
     "footer_small_text":  False,
     "body_small_text":    False,
     "brand_small_text":   False,
-
-    # رنگ نوار بالا — آبی تیره
     "brand_colour":   "navbar-primary",
-    "accent":         "accent-warning",   # طلایی برای تاکید
+    "accent":         "accent-warning",
     "navbar":         "navbar-dark navbar-primary",
     "no_navbar_border": True,
     "navbar_fixed":   True,
-
-    # layout
     "layout_boxed":  False,
     "footer_fixed":  False,
-
-    # سایدبار — تیره حرفه‌ای
     "sidebar_fixed":              False,
     "sidebar":                    "sidebar-dark-primary",
     "sidebar_nav_small_text":     False,
@@ -309,13 +287,8 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style":  True,
     "sidebar_nav_legacy_style":   False,
     "sidebar_nav_flat_style":     False,
-    "layout_boxed": False,
-
-    # تم
     "theme":           "default",
     "dark_mode_theme": None,
-
-    # دکمه‌ها
     "button_classes": {
         "primary":   "btn-primary",
         "secondary": "btn-outline-secondary",
@@ -324,7 +297,5 @@ JAZZMIN_UI_TWEAKS = {
         "danger":    "btn-danger",
         "success":   "btn-success",
     },
-
-    # actions
     "actions_sticky_top": True,
 }

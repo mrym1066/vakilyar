@@ -1,14 +1,22 @@
-<h2>دسته‌بندی پرونده‌ها</h2>
-<div class="panel-group category-movakels" id="accordian"><!--category-movakels-->
-    {% for category in category_list %}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a href="{% url 'movakel-categories-list' cat=category.name %}">
-                        {{ category.name }} ({{ category.count }})
-                    </a>
-                </h4>
-            </div>
-        </div>
-    {% endfor %}
-</div><!--/category-movakels-->
+<div class="ml-sidebar-widget">
+    <h3 class="ml-widget-title">
+        <i class="fa fa-tags"></i>
+        دسته‌بندی پرونده‌ها
+    </h3>
+
+    <ul class="ml-widget-list">
+        {% for category in category_list %}
+            <li class="ml-widget-item">
+                <a href="{% url 'movakel-categories-list' cat=category.name %}">
+                    <span class="ml-widget-name">{{ category.name }}</span>
+                    <span class="ml-widget-count">{{ category.count }}</span>
+                </a>
+            </li>
+        {% empty %}
+            <li class="ml-widget-empty">
+                <i class="fa fa-info-circle"></i>
+                دسته‌بندی ثبت نشده
+            </li>
+        {% endfor %}
+    </ul>
+</div>

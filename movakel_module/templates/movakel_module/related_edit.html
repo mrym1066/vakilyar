@@ -3,116 +3,172 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block header_references %}
-<style>
-    .related-edit-page {
-        max-width: 1050px;
-        margin: 35px auto 60px;
-        padding: 0 15px;
-        direction: rtl;
-    }
-    .related-edit-card {
-        background: #fff;
-        border: 1px solid #e7e7e7;
-        border-radius: 14px;
-        box-shadow: 0 8px 28px rgba(0,0,0,.07);
-        overflow: hidden;
-    }
-    .related-edit-header {
-        padding: 24px 28px;
-        background: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
-    }
-    .related-edit-header h2 {
-        margin: 0 0 8px;
-        font-size: 24px;
-        font-weight: 700;
-    }
-    .related-edit-header p {
-        margin: 0;
-        color: #777;
-    }
-    .related-edit-body { padding: 28px; }
-    .edit-field { margin-bottom: 20px; }
-    .edit-field label {
-        display: block;
-        margin-bottom: 7px;
-        font-weight: 600;
-        color: #333;
-    }
-    .edit-field input:not([type="checkbox"]),
-    .edit-field select,
-    .edit-field textarea {
-        width: 100%;
-        min-height: 42px;
-        border: 1px solid #d9dee3;
-        border-radius: 8px;
-        padding: 9px 12px;
-        background: #fff;
-        box-sizing: border-box;
-    }
-    .edit-field textarea { min-height: 110px; resize: vertical; }
-    .edit-field input[type="checkbox"] { width: 20px; height: 20px; }
-    .field-help { display: block; margin-top: 5px; color: #888; font-size: 12px; }
-    .field-error { color: #b42318; font-size: 13px; margin-top: 5px; }
-    .edit-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-start;
-        margin-top: 28px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-    }
-    .edit-actions .btn { min-width: 130px; border-radius: 8px; }
-    .form-check-row { display: flex; align-items: center; gap: 9px; }
-    .form-check-row label { margin: 0; }
-</style>
-{% endblock %}
-
 {% block content %}
 <section class="related-edit-page">
-    <div class="related-edit-card">
-        <div class="related-edit-header">
-            <h2>✏️ {{ title }}</h2>
-            {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
-        </div>
+    <div class="container">
 
-        <div class="related-edit-body">
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-            {% endif %}
-
-            <form method="post" enctype="multipart/form-data" novalidate>
-                {% csrf_token %}
-                <div class="row">
-                    {% for field in form %}
-                        <div class="col-sm-6 edit-field {% if field.name == 'description' or field.name == 'final_result' or field.name == 'primary_court_result' or field.name == 'appeal_court_result' or field.name == 'executive_court_result' or field.name == 'address' %}col-sm-12{% endif %}">
-                            {% if field.field.widget.input_type == 'checkbox' %}
-                                <div class="form-check-row">
-                                    {{ field }}
-                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                </div>
-                            {% else %}
-                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                {{ field }}
-                            {% endif %}
-
-                            {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
-                            {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <div class="edit-actions">
-                    <button type="submit" class="btn btn-primary">💾 ذخیره تغییرات</button>
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li>
+                        <a href="{% url 'movakel-list' %}">
+                            <i class="fa fa-home"></i>
+                            <span>خانه</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'movakel-list' %}">
+                            <i class="fa fa-folder-open"></i>
+                            <span>پرونده‌ها</span>
+                        </a>
+                    </li>
                     {% if back_url %}
-                        <a href="{{ back_url }}" class="btn btn-default">انصراف</a>
-                    {% else %}
-                        <button type="button" class="btn btn-default" onclick="history.back()">انصراف</button>
+                        <li>
+                            <a href="{{ back_url }}">
+                                <i class="fa fa-user"></i>
+                                <span>{{ subtitle|default:"پرونده"|truncatechars:20 }}</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="active">
+                        <i class="fa fa-pencil"></i>
+                        <span>{{ title }}</span>
+                    </li>
+                </ol>
+                <button type="button" class="btn-back" onclick="history.back()">
+                    <i class="fa fa-arrow-right"></i>
+                    <span>بازگشت</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- هدر سرمه‌ای -->
+        <div class="service-header">
+            <div class="service-header-info">
+                <div class="service-header-icon">
+                    <i class="fa fa-pencil-square-o"></i>
+                </div>
+                <div>
+                    <h1 class="service-title">{{ title }}</h1>
+                    {% if subtitle %}
+                        <p class="service-subtitle">
+                            <i class="fa fa-user"></i>
+                            <strong>{{ subtitle }}</strong>
+                        </p>
                     {% endif %}
                 </div>
-            </form>
+            </div>
+            {% if back_url %}
+                <div class="service-header-actions no-print">
+                    <a href="{{ back_url }}" class="btn-service-view">
+                        <i class="fa fa-eye"></i>
+                        <span>مشاهده پرونده</span>
+                    </a>
+                </div>
+            {% endif %}
         </div>
+
+        <!-- پیام‌ها -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-custom alert-custom-{{ message.tags }}">
+                    <i class="fa fa-info-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- فرم -->
+        <form method="post" enctype="multipart/form-data" class="service-form" novalidate>
+            {% csrf_token %}
+
+            <div class="service-section-block">
+                <div class="service-section-header">
+                    <div class="service-section-icon service-icon-navy">
+                        <i class="fa fa-edit"></i>
+                    </div>
+                    <div>
+                        <h3>ویرایش اطلاعات</h3>
+                        <p>فیلدهای زیر را ویرایش کنید</p>
+                    </div>
+                </div>
+
+                <div class="service-section-body">
+                    {% if form.non_field_errors %}
+                        <div class="field-error" style="margin-bottom: 16px;">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        {% for field in form %}
+                            <div class="col-md-6 col-sm-6 {% if field.name == 'description' or field.name == 'final_result' or field.name == 'primary_court_result' or field.name == 'appeal_court_result' or field.name == 'executive_court_result' or field.name == 'address' or field.name == 'content' or field.name == 'notes' %}col-md-12{% endif %}">
+                                <div class="service-field">
+                                    {% if field.field.widget.input_type == 'checkbox' %}
+                                        <label class="service-checkbox">
+                                            {{ field }}
+                                            <span class="service-checkbox-label">{{ field.label }}</span>
+                                        </label>
+                                    {% else %}
+                                        <label class="service-label">
+                                            <i class="fa fa-circle-o"></i>
+                                            {{ field.label }}
+                                        </label>
+                                        {{ field }}
+                                    {% endif %}
+
+                                    {% if field.help_text %}
+                                        <small class="field-help">{{ field.help_text }}</small>
+                                    {% endif %}
+
+                                    {% for error in field.errors %}
+                                        <div class="field-error">
+                                            <i class="fa fa-exclamation-triangle"></i>
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- دکمه‌ها -->
+            <div class="service-form-actions">
+                <button type="submit" class="btn-service-save">
+                    <i class="fa fa-save"></i>
+                    <span>ذخیره تغییرات</span>
+                </button>
+
+                {% if back_url %}
+                    <a href="{{ back_url }}" class="btn-service-cancel">
+                        <i class="fa fa-times"></i>
+                        <span>انصراف</span>
+                    </a>
+                {% else %}
+                    <button type="button" class="btn-service-cancel" onclick="history.back()">
+                        <i class="fa fa-times"></i>
+                        <span>انصراف</span>
+                    </button>
+                {% endif %}
+            </div>
+
+        </form>
+
+        <!-- راهنما -->
+        <div class="service-info-box">
+            <div class="info-icon">
+                <i class="fa fa-lightbulb-o"></i>
+            </div>
+            <div class="info-content">
+                <strong>راهنما:</strong>
+                پس از ویرایش، دکمه «ذخیره تغییرات» را بزنید. فیلدهای خالی نادیده گرفته می‌شوند.
+            </div>
+        </div>
+
     </div>
 </section>
 {% endblock %}

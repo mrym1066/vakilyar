@@ -7,7 +7,7 @@ from .models import User
 class CustomUserAdmin(UserAdmin):
     list_display = ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_approved', 'is_staff']
     list_filter = ['is_active', 'is_approved', 'is_staff']
-    list_editable = ['is_active', 'is_approved']
+    list_editable = ['is_approved']
     
     fieldsets = UserAdmin.fieldsets + (
         ('اطلاعات اضافی', {'fields': ('avatar', 'about_user', 'address', 'is_approved')}),

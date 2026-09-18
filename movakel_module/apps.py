@@ -1,4 +1,4 @@
-from django.apps import AppConfig
+﻿from django.apps import AppConfig
 
 
 class MovakelModuleConfig(AppConfig):
@@ -6,10 +6,5 @@ class MovakelModuleConfig(AppConfig):
     name = 'movakel_module'
     verbose_name = 'ماژول پرونده'
 
-
     def ready(self):
-        import movakel_module.signals  # جایگزین با مسیر مناسب
-        import movakel_module.templatetags.jalali_filters
-
-    
-  
+        import movakel_module.signals

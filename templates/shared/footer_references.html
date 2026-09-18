@@ -1,28 +1,81 @@
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/jquery.scrollUp.min.js"></script>
-<script src="/static/js/jquery.prettyPhoto.js"></script>
-<script src="/static/js/main.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/static/js/custom.js"></script>
+{% load static %}
+
+<!-- ═══ jQuery ═══ -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // تنظیم تاریخ روز به صورت خودکار
-    document.getElementById('current_date').textContent = new Date().toLocaleDateString('fa-IR');
 
-    // محاسبه مدت جلسه به صورت خودکار
-    document.getElementById('id_start_time').addEventListener('change', updateDuration);
-    document.getElementById('id_end_time').addEventListener('change', updateDuration);
+<!-- ═══ Bootstrap ═══ -->
+<script src="/static/js/bootstrap.min.js"></script>
 
-    function updateDuration() {
-        let start = document.getElementById('id_start_time').value;
-        let end = document.getElementById('id_end_time').value;
+<!-- ═══ پلاگین‌ها ═══ -->
+<script src="/static/js/jquery.scrollUp.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        if (start && end) {
-            let diff = (new Date(`1970-01-01T${end}`) - new Date(`1970-01-01T${start}`)) / 60000;
-            document.getElementById('duration_display').value = diff + " دقیقه";
-        }
-    }
-</script>
-<!-- ====== اضافه کردن اسکریپت مودال ====== -->
+<!-- ═══ اسکریپت‌های اختصاصی ═══ -->
+<script src="/static/js/main.js"></script>
+<script src="/static/js/custom.js"></script>
 <script src="/static/js/modal_edit.js"></script>
+
+<!-- ═══ اسکریپت‌های inline با چک ایمن ═══ -->
+<script>
+    (function() {
+        'use strict';
+
+        // ─── تنظیم تاریخ شمسی (اگه عنصر هست)
+        const currentDate = document.getElementById('current_date');
+        if (currentDate) {
+            try {
+                currentDate.textContent = new Date().toLocaleDateString('fa-IR');
+            } catch (e) {
+                console.warn('خطا در نمایش تاریخ:', e);
+            }
+        }
+
+        // ─── محاسبه مدت جلسه
+        function updateDuration() {
+            const start = document.getElementById('id_start_time');
+            const end = document.getElementById('id_end_time');
+            const durationDisplay = document.getElementById('duration_display');
+
+            if (!start || !end || !durationDisplay) return;
+
+            if (start.value && end.value) {
+                try {
+                    const diff = (new Date(`1970-01-01T${end.value}`) - new Date(`1970-01-01T${start.value}`)) / 60000;
+                    if (diff > 0) {
+                        durationDisplay.value = diff + " دقیقه";
+                    } else {
+                        durationDisplay.value = "کمتر از ۱ دقیقه";
+                    }
+                } catch (e) {
+                    console.warn('خطا در محاسبه مدت:', e);
+                }
+            }
+        }
+
+        const startTime = document.getElementById('id_start_time');
+        const endTime = document.getElementById('id_end_time');
+        if (startTime && endTime) {
+            startTime.addEventListener('change', updateDuration);
+            endTime.addEventListener('change', updateDuration);
+        }
+
+        // ─── Smooth scroll برای لینک‌های داخلی
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ─── Tooltip برای آیکون‌های بدون متن
+        document.querySelectorAll('[data-toggle="tooltip"]').forEach(el => {
+            if (typeof jQuery !== 'undefined') {
+                jQuery(el).tooltip();
+            }
+        });
+
+    })();
+</script>

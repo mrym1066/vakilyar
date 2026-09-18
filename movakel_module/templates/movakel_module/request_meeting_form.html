@@ -1,44 +1,411 @@
 {% extends 'shared/_layout.html' %}
-{% load widget_tweaks %}
+{% load static %}
 
-{% block title %}ثبت درخواست ملاقات جدید{% endblock %}
+{% block title %}ثبت ملاقات جدید{% endblock %}
 
 {% block content %}
-<section class="py-4" dir="rtl">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">📋 ثبت درخواست ملاقات جدید</h5>
-                    </div>
-                    <div class="card-body">
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert {{ message.tags }}">{{ message }}</div>
-                            {% endfor %}
-                        {% endif %}
+<section class="meeting-form-page">
+    <div class="mf-container">
 
-                        <form method="POST">
-                            {% csrf_token %}
-                            {% for field in form %}
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">{{ field.label }}</label>
-                                    {{ field|add_class:"form-control" }}
-                                    {% if field.errors %}
-                                        <div class="text-danger small mt-1">{{ field.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                            <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-success">💾 ثبت ملاقات</button>
-                                <a href="{% url 'meeting_list' %}" class="btn btn-secondary">انصراف</a>
-                            </div>
-                        </form>
-                    </div>
+        <!-- ===== Breadcrumb ===== -->
+        <nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+            <div class="mf-breadcrumb-inner">
+                <ol class="breadcrumb">
+                    <li>
+                        <a href="{% url 'movakel-list' %}">
+                            <i class="fa fa-home"></i>
+                            <span>خانه</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'meeting_list' %}">
+                            <i class="fa fa-calendar"></i>
+                            <span>ملاقات‌ها</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <i class="fa fa-plus-circle"></i>
+                        <span>ثبت ملاقات جدید</span>
+                    </li>
+                </ol>
+                <button type="button" class="btn-back" onclick="history.back()">
+                    <i class="fa fa-arrow-right"></i>
+                    <span>بازگشت</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ===== هدر سرمه‌ای ===== -->
+        <div class="mf-header">
+            <div class="mf-header-info">
+                <div class="mf-header-icon">
+                    <i class="fa fa-calendar-plus-o"></i>
+                </div>
+                <div class="mf-header-text">
+                    <h1>ثبت درخواست ملاقات</h1>
+                    <p>
+                        <i class="fa fa-info-circle"></i>
+                        اطلاعات متقاضی و زمان ملاقات را وارد کنید
+                    </p>
+                </div>
+            </div>
+
+            <!-- نوار تاریخ و شماره دفتر (بالای فرم، برای پرینت) -->
+            <div class="mf-header-meta">
+                <div class="mf-meta-item">
+                    <i class="fa fa-calendar"></i>
+                    <span>تاریخ:</span>
+                    <strong id="current_date"></strong>
+                </div>
+                <div class="mf-meta-item">
+                    <i class="fa fa-hashtag"></i>
+                    <span>شماره دفتر:</span>
+                    <input type="text"
+                           id="office_number"
+                           name="office_number"
+                           class="mf-meta-input"
+                           placeholder="_____"
+                           maxlength="20">
                 </div>
             </div>
         </div>
+
+        <!-- ===== پیام‌ها ===== -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-custom alert-custom-{{ message.tags }}">
+                    <i class="fa fa-info-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- ===== فرم ===== -->
+        <form method="POST" class="mf-form" novalidate>
+            {% csrf_token %}
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- بخش ۱: اطلاعات هویتی -->
+            <!-- ═══════════════════════════════════════ -->
+            <div class="mf-section">
+                <div class="mf-section-header">
+                    <div class="mf-section-icon mf-icon-navy">
+                        <i class="fa fa-user-circle"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات هویتی</h3>
+                        <p>نام، کد ملی و مشخصات شناسایی متقاضی</p>
+                    </div>
+                </div>
+
+                <div class="mf-section-body">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-user"></i>
+                                    {{ form.full_name.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.full_name }}
+                                {% if form.full_name.errors %}
+                                    <div class="mf-error">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                        {{ form.full_name.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-id-card"></i>
+                                    {{ form.national_id.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.national_id }}
+                                {% if form.national_id.errors %}
+                                    <div class="mf-error">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                        {{ form.national_id.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-id-badge"></i>
+                                    {{ form.identification_number.label }}
+                                </label>
+                                {{ form.identification_number }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-birthday-cake"></i>
+                                    {{ form.birth_date.label }}
+                                </label>
+                                {{ form.birth_date }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- بخش ۲: اطلاعات تماس -->
+            <!-- ═══════════════════════════════════════ -->
+            <div class="mf-section">
+                <div class="mf-section-header">
+                    <div class="mf-section-icon mf-icon-gold">
+                        <i class="fa fa-address-book"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات تماس</h3>
+                        <p>راه‌های ارتباطی با متقاضی</p>
+                    </div>
+                </div>
+
+                <div class="mf-section-body">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-mobile"></i>
+                                    {{ form.mobile_number.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.mobile_number }}
+                                {% if form.mobile_number.errors %}
+                                    <div class="mf-error">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                        {{ form.mobile_number.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-phone"></i>
+                                    {{ form.phone_number.label }}
+                                </label>
+                                {{ form.phone_number }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-comments"></i>
+                                    {{ form.virtual_number.label }}
+                                </label>
+                                {{ form.virtual_number }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-envelope"></i>
+                                    {{ form.email.label }}
+                                </label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-map-pin"></i>
+                                    {{ form.postal_code.label }}
+                                </label>
+                                {{ form.postal_code }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-map-marker"></i>
+                                    {{ form.address.label }}
+                                </label>
+                                {{ form.address }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- بخش ۳: اطلاعات ملاقات -->
+            <!-- ═══════════════════════════════════════ -->
+            <div class="mf-section">
+                <div class="mf-section-header">
+                    <div class="mf-section-icon mf-icon-success">
+                        <i class="fa fa-calendar-check-o"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات ملاقات</h3>
+                        <p>نوع ملاقات، موضوع و زمان جلسه</p>
+                    </div>
+                </div>
+
+                <div class="mf-section-body">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-tag"></i>
+                                    {{ form.meeting_type.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.meeting_type }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-calendar"></i>
+                                    {{ form.meeting_date.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.meeting_date }}
+                                {% if form.meeting_date.errors %}
+                                    <div class="mf-error">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                        {{ form.meeting_date.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- موضوعات ملاقات (چک‌باکس) -->
+                        <div class="col-md-12">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-list-ul"></i>
+                                    موضوعات ملاقات
+                                </label>
+                                <div class="mf-subjects">
+                                    {% for checkbox in form.meeting_subject %}
+                                        <label class="mf-subject">
+                                            {{ checkbox.tag }}
+                                            <span>{{ checkbox.choice_label }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-clock-o"></i>
+                                    {{ form.start_time.label }}
+                                </label>
+                                {{ form.start_time }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-clock-o"></i>
+                                    {{ form.end_time.label }}
+                                </label>
+                                {{ form.end_time }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-hourglass-half"></i>
+                                    {{ form.duration.label }}
+                                </label>
+                                {{ form.duration }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="mf-field">
+                                <label>
+                                    <i class="fa fa-money"></i>
+                                    {{ form.meeting_fee.label }}
+                                </label>
+                                {{ form.meeting_fee }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- بخش امضاها -->
+            <!-- ═══════════════════════════════════════ -->
+            <div class="mf-section">
+                <div class="mf-signatures">
+                    <div class="mf-signature-box">
+                        <p class="mf-signature-title">امضای موکل</p>
+                        <div class="mf-signature-line"></div>
+                    </div>
+                    <div class="mf-signature-box">
+                        <p class="mf-signature-title">امضای وکیل</p>
+                        <div class="mf-signature-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- دکمه‌ها -->
+            <!-- ═══════════════════════════════════════ -->
+            <div class="mf-actions no-print">
+                <button type="submit" class="mf-btn mf-btn-primary">
+                    <i class="fa fa-save"></i>
+                    <span>ثبت ملاقات</span>
+                </button>
+                <button type="button" class="mf-btn mf-btn-gold" onclick="printForm()">
+                    <i class="fa fa-print"></i>
+                    <span>چاپ فرم</span>
+                </button>
+                <a href="{% url 'meeting_list' %}" class="mf-btn mf-btn-outline">
+                    <i class="fa fa-times"></i>
+                    <span>انصراف</span>
+                </a>
+            </div>
+
+        </form>
+
     </div>
 </section>
+
+<script>
+    // ═══ نمایش تاریخ شمسی ═══
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateEl = document.getElementById('current_date');
+        if (dateEl) {
+            const now = new Date();
+            const persianDate = new Intl.DateTimeFormat('fa-IR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).format(now);
+            dateEl.textContent = persianDate;
+        }
+    });
+
+    // ═══ چاپ فرم ═══
+    function printForm() {
+        window.print();
+    }
+</script>
+
 {% endblock %}

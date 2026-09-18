@@ -1,3 +1,111 @@
-{{ site_setting.copy_right|default:"© وکیل‌یار — سامانه مدیریت پرونده‌های وکالت" }}
+{% load static %}
+<footer id="footer" class="site-footer no-print" role="contentinfo">
+    <div class="footer-top">
+        <div class="container">
+            <div class="row">
 
-نسخه داخلی — ویژه کارکنان دفتر
+                <!-- ستون ۱ — درباره -->
+                <div class="col-sm-4 col-md-4 footer-widget">
+                    <h4>
+                        <i class="fa fa-balance-scale"></i>
+                        وکیل‌یار
+                    </h4>
+                    <p class="footer-desc">
+                        سامانه جامع مدیریت پرونده‌های حقوقی و موکلین.
+                        ویژه دفاتر وکالت و کارکنان حقوقی.
+                    </p>
+                </div>
+
+                <!-- ستون ۲ — لینک‌های سریع -->
+                <div class="col-sm-4 col-md-4 footer-widget">
+                    <h4>
+                        <i class="fa fa-link"></i>
+                        دسترسی سریع
+                    </h4>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="{% url 'movakel-list' %}">
+                                <i class="fa fa-angle-left"></i>
+                                لیست پرونده‌ها
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'meeting_list' %}">
+                                <i class="fa fa-angle-left"></i>
+                                ملاقات‌ها
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'articles_list' %}">
+                                <i class="fa fa-angle-left"></i>
+                                مقالات حقوقی
+                            </a>
+                        </li>
+                        {% if request.user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'user_panel_dashboard' %}">
+                                    <i class="fa fa-angle-left"></i>
+                                    پنل کاربری
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- ستون ۳ — اطلاعات تماس -->
+                <div class="col-sm-4 col-md-4 footer-widget">
+                    <h4>
+                        <i class="fa fa-phone"></i>
+                        تماس با ما
+                    </h4>
+                    <ul class="footer-contact">
+                        {% if site_setting.address %}
+                            <li>
+                                <i class="fa fa-map-marker"></i>
+                                <span>{{ site_setting.address }}</span>
+                            </li>
+                        {% endif %}
+                        {% if site_setting.phone %}
+                            <li>
+                                <i class="fa fa-phone"></i>
+                                <a href="tel:{{ site_setting.phone }}">{{ site_setting.phone }}</a>
+                            </li>
+                        {% endif %}
+                        {% if site_setting.email %}
+                            <li>
+                                <i class="fa fa-envelope"></i>
+                                <a href="mailto:{{ site_setting.email }}">{{ site_setting.email }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    <div class="footer-social">
+                        <a href="#" aria-label="اینستاگرام"><i class="fa fa-instagram"></i></a>
+                        <a href="#" aria-label="تلگرام"><i class="fa fa-telegram"></i></a>
+                        <a href="#" aria-label="واتساپ"><i class="fa fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- نوار پایین فوتر -->
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-xs-12 text-right">
+                    <p class="footer-note">
+                        {{ site_setting.copy_right|default:"© وکیل‌یار — سامانه مدیریت پرونده‌های وکالت" }}
+                    </p>
+                </div>
+                <div class="col-sm-6 col-xs-12 text-left">
+                    <p class="footer-note">
+                        <i class="fa fa-code"></i>
+                        نسخه داخلی — ویژه کارکنان دفتر
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,28 +1,210 @@
 {% extends 'shared/_layout.html' %}
-{% load render_partial %}
+{% load common_tags %}
 
-{% block title %}
-    ویرایش اطلاعات کاربری
+{% block title %}ویرایش اطلاعات کاربری{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i><span>خانه</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'user_panel_dashboard' %}">
+                    <i class="fa fa-user"></i><span>پنل کاربری</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-user-circle"></i><span>ویرایش اطلاعات</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i><span>بازگشت</span>
+        </button>
+    </div>
+</nav>
 {% endblock %}
 
 {% block content %}
+<section class="user-panel-section">
     <div class="container">
         <div class="row">
-            <div class="col-md-4">
-                {% if current_user.avatar %}
-                    <a class="thumbnail">
-                        <img style="width: 100%" src="{{ current_user.avatar.url }}" alt="">
-                    </a>
-                {% endif %}
-                {% render_partial 'user_panel_module.views.user_panel_menu_component' %}
+
+            <!-- ═══ سایدبار ═══ -->
+            <div class="col-md-3 col-sm-4">
+                <aside class="user-panel-sidebar">
+                    <div class="sidebar-user-info">
+                        {% if current_user.avatar %}
+                            <img src="{{ current_user.avatar.url }}"
+                                 alt="{{ current_user.get_full_name }}"
+                                 class="sidebar-avatar-img">
+                        {% else %}
+                            <div class="sidebar-avatar">
+                                {{ request.user.first_name|first|default:request.user.username|first }}
+                            </div>
+                        {% endif %}
+                        <div class="sidebar-username">
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </div>
+                        <div class="sidebar-userrole">
+                            <i class="fa fa-user-circle"></i>
+                            {% if request.user.is_superuser %}مدیر سیستم{% else %}کاربر{% endif %}
+                        </div>
+                    </div>
+
+                    <ul class="sidebar-nav">
+                        <li>
+                            <a href="{% url 'user_panel_dashboard' %}">
+                                <i class="fa fa-th-large"></i>
+                                <span>داشبورد</span>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="{% url 'edit_profile_page' %}">
+                                <i class="fa fa-user-circle"></i>
+                                <span>ویرایش اطلاعات</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'change_password_page' %}">
+                                <i class="fa fa-lock"></i>
+                                <span>تغییر رمز عبور</span>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{% url 'movakel-list' %}">
+                                <i class="fa fa-folder-open"></i>
+                                <span>پرونده‌ها</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'meeting_list' %}">
+                                <i class="fa fa-calendar"></i>
+                                <span>ملاقات‌ها</span>
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
             </div>
-            <div class="col-md-8">
-                <form enctype="multipart/form-data" action="{% url 'edit_profile_page' %}" method="post">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-success">ثبت</button>
-                </form>
+
+            <!-- ═══ محتوا ═══ -->
+            <div class="col-md-9 col-sm-8">
+                <div class="user-panel-card">
+
+                    <div class="user-panel-header">
+                        <div class="user-panel-header-icon">
+                            <i class="fa fa-user-circle"></i>
+                        </div>
+                        <div>
+                            <h1>ویرایش اطلاعات کاربری</h1>
+                            <p>اطلاعات شخصی خود را بروزرسانی کنید</p>
+                        </div>
+                    </div>
+
+                    <!-- پیام‌ها -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                <i class="fa fa-info-circle"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- خطاهای کلی -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form enctype="multipart/form-data"
+                          action="{% url 'edit_profile_page' %}"
+                          method="post"
+                          class="user-panel-form"
+                          novalidate>
+                        {% csrf_token %}
+
+                        <div class="form-section">
+                            <div class="form-section-header">
+                                <i class="fa fa-user"></i>
+                                <h3>اطلاعات شخصی</h3>
+                            </div>
+
+                            <div class="row">
+                                {% for field in form %}
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}">
+                                                {% if field.name == 'first_name' %}
+                                                    <i class="fa fa-user"></i>
+                                                {% elif field.name == 'last_name' %}
+                                                    <i class="fa fa-user"></i>
+                                                {% elif field.name == 'email' %}
+                                                    <i class="fa fa-envelope"></i>
+                                                {% elif field.name == 'avatar' %}
+                                                    <i class="fa fa-image"></i>
+                                                {% elif field.name == 'about_user' %}
+                                                    <i class="fa fa-comment"></i>
+                                                {% elif field.name == 'address' %}
+                                                    <i class="fa fa-map-marker"></i>
+                                                {% else %}
+                                                    <i class="fa fa-circle-o"></i>
+                                                {% endif %}
+                                                {{ field.label }}
+                                                {% if field.field.required %}<span class="required">*</span>{% endif %}
+                                            </label>
+
+                                            {% if field.name == 'about_user' or field.name == 'address' %}
+                                                <div class="col-md-12" style="padding:0;">
+                                                    {{ field }}
+                                                </div>
+                                            {% else %}
+                                                {{ field }}
+                                            {% endif %}
+
+                                            {% if field.help_text %}
+                                                <div class="form-hint">
+                                                    <i class="fa fa-info-circle"></i>
+                                                    {{ field.help_text|safe }}
+                                                </div>
+                                            {% endif %}
+
+                                            {% if field.errors %}
+                                                <div class="field-error">
+                                                    {% for error in field.errors %}
+                                                        <i class="fa fa-exclamation-triangle"></i> {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fa fa-save"></i>
+                                ذخیره تغییرات
+                            </button>
+                            <a href="{% url 'user_panel_dashboard' %}" class="btn btn-secondary btn-lg">
+                                <i class="fa fa-times"></i>
+                                انصراف
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
+
         </div>
     </div>
+</section>
 {% endblock %}

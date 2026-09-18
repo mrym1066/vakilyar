@@ -1,28 +1,545 @@
-<h2>گزارش پرداخت‌ها</h2>
-<p>پرونده: {{ movakel.title }}</p>
-<p>مبلغ توافق شده: {{ movakel.total_amount }}</p>
-<p>مبلغ باقی‌مانده: {{ remaining_amount }}</p>
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% if doc_type == 'contract' %}قرارداد وکالت
+        {% elif doc_type == 'report' %}گزارش مالی
+        {% elif doc_type == 'total_report' %}گزارش مالی کلی
+        {% elif doc_type == 'meeting_form' %}فرم پذیرش متقاضی
+        {% else %}سند{% endif %}
+    </title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm 1cm;
+        }
 
-<h3>جزئیات پرداخت‌ها:</h3>
-<table>
-    <thead>
+        * {
+            box-sizing: border-box;
+            font-family: IRANSans, Tahoma, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+            text-align: right;
+            font-family: IRANSans, Tahoma, sans-serif;
+            font-size: 11pt;
+            color: #2E2C28;
+            line-height: 1.7;
+            background: white;
+        }
+
+        /* ═══ هدر ═══ */
+        .pdf-header {
+            text-align: center;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #1B2A4A;
+        }
+
+        .pdf-header h1 {
+            color: #1B2A4A;
+            font-size: 22pt;
+            margin: 0 0 8px;
+            font-weight: bold;
+        }
+
+        .pdf-header p {
+            color: #5A5751;
+            font-size: 11pt;
+            margin: 4px 0;
+        }
+
+        .pdf-header .pdf-subtitle {
+            color: #9B9890;
+            font-size: 10pt;
+            margin-top: 8px;
+        }
+
+        /* ═══ اطلاعات موکل ═══ */
+        .pdf-client-box {
+            background: #F1EFF9;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-right: 5px solid #C9A84C;
+        }
+
+        .pdf-client-box p {
+            margin: 5px 0;
+            font-size: 11pt;
+        }
+
+        .pdf-client-box strong {
+            color: #1B2A4A;
+            font-weight: bold;
+        }
+
+        /* ═══ عنوان بخش ═══ */
+        .pdf-section-title {
+            color: #1B2A4A;
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 24px 0 14px;
+            padding: 10px 14px;
+            background: #F1EFF9;
+            border-right: 5px solid #C9A84C;
+            border-radius: 6px;
+        }
+
+        /* ═══ خلاصه مالی ═══ */
+        .pdf-summary {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px 0;
+            margin-bottom: 20px;
+            table-layout: fixed;
+        }
+
+        .pdf-summary td {
+            background: #FAF9F6;
+            padding: 14px 10px;
+            border-radius: 8px;
+            border: 1px solid #E4E1D9;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .pdf-summary .pdf-label {
+            display: block;
+            color: #5A5751;
+            font-size: 9pt;
+            margin-bottom: 8px;
+        }
+
+        .pdf-summary .pdf-value {
+            display: block;
+            color: #1B2A4A;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .pdf-summary .pdf-unit {
+            display: block;
+            color: #9B9890;
+            font-size: 8pt;
+        }
+
+        /* ═══ جدول ═══ */
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0 20px;
+            font-size: 10pt;
+            border: 2px solid #1B2A4A;
+        }
+
+        .pdf-table thead {
+            background: #1B2A4A;
+        }
+
+        .pdf-table thead th {
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 10pt;
+            color: #FFFFFF;
+            border: 1px solid #1B2A4A;
+        }
+
+        .pdf-table tbody td {
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid #E4E1D9;
+            font-size: 10pt;
+            color: #2E2C28;
+        }
+
+        .pdf-table tbody tr:nth-child(even) {
+            background: #FAF9F6;
+        }
+
+        .pdf-table tbody td strong {
+            color: #1B2A4A;
+            font-weight: bold;
+        }
+
+        .pdf-table tfoot td {
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+            background: #D4F0E2;
+            color: #0E5A2E;
+            border: 1px solid #1A7A4A;
+        }
+
+        /* ═══ پیام خالی ═══ */
+        .pdf-empty-box {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9B9890;
+            background: #FAF9F6;
+            border-radius: 8px;
+            border: 2px dashed #E4E1D9;
+            font-size: 11pt;
+        }
+
+        /* ═══ امضاها ═══ */
+        .pdf-signatures {
+            width: 100%;
+            margin-top: 50px;
+            border-collapse: separate;
+            border-spacing: 40px 0;
+            table-layout: fixed;
+        }
+
+        .pdf-signatures td {
+            text-align: center;
+            vertical-align: top;
+            padding-top: 20px;
+        }
+
+        .pdf-signatures .pdf-sig-title {
+            color: #5A5751;
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 60px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #E4E1D9;
+        }
+
+        .pdf-signatures .pdf-sig-line {
+            border-bottom: 2px dashed #1B2A4A;
+            height: 50px;
+        }
+
+        /* ═══ محتوای لایحه/قرارداد ═══ */
+        .pdf-content {
+            background: #FAF9F6;
+            border: 1px solid #E4E1D9;
+            border-right: 4px solid #C9A84C;
+            padding: 14px 18px;
+            font-size: 11pt;
+            line-height: 2;
+            color: #2E2C28;
+            text-align: justify;
+            min-height: 60px;
+            border-radius: 6px;
+        }
+
+        /* ═══ فوتر ═══ */
+        .pdf-footer {
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid #E4E1D9;
+            text-align: center;
+            color: #9B9890;
+            font-size: 9pt;
+        }
+
+        .pdf-footer p {
+            margin: 4px 0;
+        }
+
+        /* جلوگیری از شکستن صفحه */
+        .pdf-header,
+        .pdf-section-title,
+        .pdf-table,
+        .pdf-signatures {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- حالت ۱: قرارداد -->
+    <!-- ═══════════════════════════════════════ -->
+    {% if doc_type == 'contract' %}
+        <div class="pdf-header">
+            <h1>وکیل‌یار</h1>
+            <p>سامانه جامع مدیریت پرونده‌های حقوقی</p>
+            <p class="pdf-subtitle">قرارداد وکالت</p>
+        </div>
+
+        <div class="pdf-client-box">
+            <p><strong>نام موکل:</strong> {{ movakel.name|default:"—" }}</p>
+            {% if movakel.mobile_number %}<p><strong>شماره تماس:</strong> {{ movakel.mobile_number }}</p>{% endif %}
+            {% if movakel.national_id %}<p><strong>کد ملی:</strong> {{ movakel.national_id }}</p>{% endif %}
+            <p><strong>شماره پرونده:</strong> {{ movakel.id }}</p>
+            {% if movakel.contract_date %}<p><strong>تاریخ وکالت:</strong> {{ movakel.contract_date }}</p>{% endif %}
+        </div>
+
+        {% if movakel.description %}
+            <h2 class="pdf-section-title">موضوع وکالت</h2>
+            <div class="pdf-content">{{ movakel.description|linebreaksbr }}</div>
+        {% endif %}
+
+        {% if selected_services %}
+            <h2 class="pdf-section-title">خدمات توافق شده</h2>
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>نوع خدمت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in selected_services %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ service }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <h2 class="pdf-section-title">مشخصات مالی</h2>
+        <table class="pdf-summary">
+            <tr>
+                <td>
+                    <span class="pdf-label">کل حق‌الوکاله</span>
+                    <span class="pdf-value">{{ movakel.total_amount|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+                <td>
+                    <span class="pdf-label">نحوه پرداخت</span>
+                    <span class="pdf-value" style="font-size: 11pt;">{{ movakel.get_payment_method_display|default:"—" }}</span>
+                    <span class="pdf-unit">توافق شده</span>
+                </td>
+            </tr>
+        </table>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- حالت ۲: گزارش مالی -->
+    <!-- ═══════════════════════════════════════ -->
+    {% elif doc_type == 'report' %}
+        <div class="pdf-header">
+            <h1>وکیل‌یار</h1>
+            <p>سامانه جامع مدیریت پرونده‌های حقوقی</p>
+            <p class="pdf-subtitle">گزارش رسمی پرداخت‌ها</p>
+        </div>
+
+        <div class="pdf-client-box">
+            <p><strong>نام موکل:</strong> {{ movakel.name|default:"—" }}</p>
+            {% if movakel.mobile_number %}<p><strong>شماره تماس:</strong> {{ movakel.mobile_number }}</p>{% endif %}
+            {% if movakel.national_id %}<p><strong>کد ملی:</strong> {{ movakel.national_id }}</p>{% endif %}
+            <p><strong>شماره پرونده:</strong> {{ movakel.id }}</p>
+        </div>
+
+        <h2 class="pdf-section-title">خلاصه عملکرد مالی</h2>
+        <table class="pdf-summary">
+            <tr>
+                <td>
+                    <span class="pdf-label">کل حق‌الوکاله</span>
+                    <span class="pdf-value">{{ movakel.total_amount|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+                <td>
+                    <span class="pdf-label">کل دریافتی</span>
+                    <span class="pdf-value">{{ total_paid|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+                <td>
+                    <span class="pdf-label">باقی‌مانده</span>
+                    <span class="pdf-value">{{ remaining_amount|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+                <td>
+                    <span class="pdf-label">تعداد پرداخت‌ها</span>
+                    <span class="pdf-value">{{ payments|length }}</span>
+                    <span class="pdf-unit">فقره</span>
+                </td>
+            </tr>
+        </table>
+
+        <h2 class="pdf-section-title">لیست پرداخت‌های انجام شده</h2>
+
+        {% if payments %}
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th>مبلغ</th>
+                        <th>روش پرداخت</th>
+                        <th>بابت</th>
+                        <th>تاریخ پرداخت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><strong>{{ payment.amount|intcomma }}</strong></td>
+                            <td>{{ payment.get_payment_method_display|default:"—" }}</td>
+                            <td>{{ payment.get_payment_for_display|default:"—" }}</td>
+                            <td>{{ payment.payment_date|date:"Y/m/d"|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"><strong>جمع کل پرداخت‌ها</strong></td>
+                        <td><strong>{{ total_paid|default:0|intcomma }} تومان</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        {% else %}
+            <div class="pdf-empty-box">
+                هیچ پرداختی برای این پرونده ثبت نشده است.
+            </div>
+        {% endif %}
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- حالت ۳: گزارش کلی -->
+    <!-- ═══════════════════════════════════════ -->
+    {% elif doc_type == 'total_report' %}
+        <div class="pdf-header">
+            <h1>وکیل‌یار</h1>
+            <p>سامانه جامع مدیریت پرونده‌های حقوقی</p>
+            <p class="pdf-subtitle">گزارش مالی کلی دفتر</p>
+        </div>
+
+        <h2 class="pdf-section-title">خلاصه مالی کل دفتر</h2>
+        <table class="pdf-summary">
+            <tr>
+                <td>
+                    <span class="pdf-label">مجموع مبلغ توافق‌شده</span>
+                    <span class="pdf-value">{{ total_total_amount|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+                <td>
+                    <span class="pdf-label">مجموع دریافتی</span>
+                    <span class="pdf-value">{{ total_received_amount|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+                <td>
+                    <span class="pdf-label">مجموع باقی‌مانده</span>
+                    <span class="pdf-value">{{ total_remaining_amount|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+                <td>
+                    <span class="pdf-label">مجموع هزینه خدمات</span>
+                    <span class="pdf-value">{{ total_service_cost|default:0|intcomma }}</span>
+                    <span class="pdf-unit">تومان</span>
+                </td>
+            </tr>
+        </table>
+
+        {% if payments_by_category %}
+            <h2 class="pdf-section-title">پرداخت‌ها بر اساس نوع هزینه</h2>
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>نوع هزینه</th>
+                        <th>مجموع پرداختی</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in payments_by_category %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.payment_for|default:"—" }}</td>
+                            <td><strong>{{ item.total|intcomma }} تومان</strong></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- حالت ۴: فرم ملاقات -->
+    <!-- ═══════════════════════════════════════ -->
+    {% elif doc_type == 'meeting_form' %}
+        <div class="pdf-header">
+            <h1>وکیل‌یار</h1>
+            <p>سامانه جامع مدیریت پرونده‌های حقوقی</p>
+            <p class="pdf-subtitle">فرم پذیرش متقاضی</p>
+        </div>
+
+        <div class="pdf-client-box">
+            <p><strong>نام و نام خانوادگی:</strong> {{ meeting.full_name|default:"—" }}</p>
+            <p><strong>کد ملی:</strong> {{ meeting.national_id|default:"—" }}</p>
+            {% if meeting.birth_date %}<p><strong>تاریخ تولد:</strong> {{ meeting.birth_date|date:"Y/m/d" }}</p>{% endif %}
+            {% if meeting.mobile_number %}<p><strong>شماره همراه:</strong> {{ meeting.mobile_number }}</p>{% endif %}
+            {% if meeting.phone_number %}<p><strong>تلفن ثابت:</strong> {{ meeting.phone_number }}</p>{% endif %}
+            {% if meeting.email %}<p><strong>ایمیل:</strong> {{ meeting.email }}</p>{% endif %}
+            {% if meeting.address %}<p><strong>نشانی:</strong> {{ meeting.address }}</p>{% endif %}
+            {% if meeting.postal_code %}<p><strong>کد پستی:</strong> {{ meeting.postal_code }}</p>{% endif %}
+        </div>
+
+        <h2 class="pdf-section-title">اطلاعات ملاقات</h2>
+        <table class="pdf-table">
+            <tbody>
+                <tr>
+                    <td style="text-align: right; width: 40%;"><strong>نوع ملاقات:</strong></td>
+                    <td>{{ meeting.get_meeting_type_display|default:"—" }}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;"><strong>تاریخ ملاقات:</strong></td>
+                    <td>
+                        {% if meeting.meeting_date %}
+                            {{ meeting.meeting_date|date:"Y/m/d" }}
+                        {% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% if meeting.duration %}
+                    <tr>
+                        <td style="text-align: right;"><strong>مدت جلسه:</strong></td>
+                        <td>{{ meeting.duration }} دقیقه</td>
+                    </tr>
+                {% endif %}
+                {% if meeting.meeting_fee %}
+                    <tr>
+                        <td style="text-align: right;"><strong>هزینه ملاقات:</strong></td>
+                        <td>{{ meeting.meeting_fee|intcomma }} تومان</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td style="text-align: right;"><strong>موضوعات:</strong></td>
+                    <td>
+                        {% for subject in meeting.meeting_subject.all %}
+                            {{ subject.name }}{% if not forloop.last %}، {% endif %}
+                        {% empty %}—{% endfor %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- امضاها -->
+    <!-- ═══════════════════════════════════════ -->
+    <table class="pdf-signatures">
         <tr>
-            <th>مبلغ</th>
-            <th>روش پرداخت</th>
-            <th>تاریخ</th>
+            <td>
+                <p class="pdf-sig-title">
+                    {% if doc_type == 'meeting_form' %}امضای متقاضی{% else %}امضای موکل{% endif %}
+                </p>
+                <div class="pdf-sig-line"></div>
+            </td>
+            <td>
+                <p class="pdf-sig-title">مهر و امضای دفتر</p>
+                <div class="pdf-sig-line"></div>
+            </td>
         </tr>
-    </thead>
-    <tbody>
-        {% for payment in payments %}
-        <tr>
-            <td>{{ payment.amount }}</td>
-            <td>{{ payment.get_payment_method_display }}</td>
-            <td>{{ payment.payment_date }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3">هیچ پرداختی ثبت نشده است.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    </table>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- فوتر -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="pdf-footer">
+        <p>این سند به صورت خودکار توسط سامانه وکیل‌یار تولید شده است.</p>
+        <p>تاریخ چاپ: {% now "Y/m/d" %}</p>
+    </div>
+
+</body>
+</html>

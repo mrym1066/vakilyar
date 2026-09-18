@@ -1,126 +1,299 @@
 {% extends 'shared/_layout.html' %}
+{% load common_tags %}
 
 {% block title %}جستجوی پیشرفته{% endblock %}
 
-{% block content %}
-<div class="container mt-4" dir="rtl">
-    <h4 class="mb-4">🔍 جستجوی پیشرفته پرونده‌ها</h4>
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-folder-open"></i>
+                    <span>پرونده‌ها</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-search"></i>
+                <span>جستجوی پیشرفته</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i>
+            <span>بازگشت</span>
+        </button>
+    </div>
+</nav>
+{% endblock %}
 
-    <!-- فرم جستجو -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" action="">
-                <div class="row g-3">
+{% block content %}
+<section class="advanced-search-section">
+    <div class="container">
+
+        <!-- ═══ هدر صفحه ═══ -->
+        <div class="search-header">
+            <div class="search-header-info">
+                <div class="search-header-icon">
+                    <i class="fa fa-search"></i>
+                </div>
+                <div>
+                    <h1 class="search-title">جستجوی پیشرفته پرونده‌ها</h1>
+                    <p class="search-subtitle">
+                        با استفاده از فیلترهای زیر، پرونده مورد نظر خود را پیدا کنید
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ فرم جستجو ═══ -->
+        <div class="search-form-card">
+            <form method="GET" action="" class="search-form">
+                <div class="row">
 
                     <!-- جستجوی متنی -->
-                    <div class="col-md-12">
-                        <input
-                            type="text"
-                            name="q"
-                            class="form-control form-control-lg"
-                            placeholder="نام موکل، شماره مکانیزه، موبایل، شماره پرونده..."
-                            value="{{ query }}"
-                            autofocus
-                        >
+                    <div class="col-md-12 col-sm-12">
+                        <div class="form-group search-main-input">
+                            <label>
+                                <i class="fa fa-search"></i>
+                                جستجو در متن
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="fa fa-search input-icon"></i>
+                                <input type="text"
+                                       name="q"
+                                       class="form-control form-control-lg"
+                                       placeholder="نام موکل، شماره مکانیزه، موبایل، شماره پرونده، توضیحات..."
+                                       value="{{ query }}"
+                                       autofocus>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- دسته‌بندی -->
-                    <div class="col-md-4">
-                        <label class="form-label">دسته‌بندی</label>
-                        <select name="category" class="form-select">
-                            <option value="">همه دسته‌ها</option>
-                            {% for cat in categories %}
-                            <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
-                                {{ cat.title }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-tags"></i>
+                                دسته‌بندی
+                            </label>
+                            <select name="category" class="form-control">
+                                <option value="">— همه دسته‌ها —</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.id }}"
+                                            {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ cat.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
 
                     <!-- وضعیت -->
-                    <div class="col-md-4">
-                        <label class="form-label">وضعیت پرونده</label>
-                        <select name="status" class="form-select">
-                            <option value="">همه</option>
-                            <option value="active" {% if selected_status == 'active' %}selected{% endif %}>فعال</option>
-                            <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>غیرفعال</option>
-                        </select>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-flag"></i>
+                                وضعیت پرونده
+                            </label>
+                            <select name="status" class="form-control">
+                                <option value="">— همه وضعیت‌ها —</option>
+                                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>
+                                    ✅ فعال
+                                </option>
+                                <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>
+                                    ❌ غیرفعال
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- تاریخ از -->
-                    <div class="col-md-2">
-                        <label class="form-label">از تاریخ</label>
-                        <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+                    <div class="col-md-2 col-sm-6">
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-calendar"></i>
+                                از تاریخ
+                            </label>
+                            <input type="date"
+                                   name="date_from"
+                                   class="form-control"
+                                   value="{{ date_from }}">
+                        </div>
                     </div>
 
                     <!-- تاریخ تا -->
-                    <div class="col-md-2">
-                        <label class="form-label">تا تاریخ</label>
-                        <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+                    <div class="col-md-2 col-sm-6">
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-calendar-check-o"></i>
+                                تا تاریخ
+                            </label>
+                            <input type="date"
+                                   name="date_to"
+                                   class="form-control"
+                                   value="{{ date_to }}">
+                        </div>
                     </div>
 
                     <!-- دکمه‌ها -->
-                    <div class="col-md-12 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary px-4">🔍 جستجو</button>
-                        <a href="{% url 'advanced_search' %}" class="btn btn-outline-secondary">پاک کردن فیلترها</a>
+                    <div class="col-md-12">
+                        <div class="search-form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fa fa-search"></i>
+                                جستجو
+                            </button>
+                            <a href="{% url 'advanced_search' %}" class="btn btn-secondary btn-lg">
+                                <i class="fa fa-times"></i>
+                                پاک کردن فیلترها
+                            </a>
+                        </div>
                     </div>
 
                 </div>
             </form>
         </div>
-    </div>
 
-    <!-- نتایج -->
-    {% if query or selected_category or selected_status or date_from or date_to %}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="text-muted">{{ result_count }} پرونده یافت شد</span>
-    </div>
+        <!-- ═══ نتایج ═══ -->
+        {% if query or selected_category or selected_status or date_from or date_to %}
 
-    {% if movakels %}
-    <div class="table-responsive">
-        <table class="table table-hover table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>نام موکل</th>
-                    <th>شماره مکانیزه</th>
-                    <th>موبایل</th>
-                    <th>دسته‌بندی</th>
-                    <th>وضعیت</th>
-                    <th>تاریخ وکالت</th>
-                    <th>عملیات</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for m in movakels %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ m.name }}</td>
-                    <td>{{ m.mechanized_number|default:"-" }}</td>
-                    <td>{{ m.mobile_number }}</td>
-                    <td>{{ m.category|default:"-" }}</td>
-                    <td>
-                        {% if m.is_active %}
-                            <span class="badge bg-success">فعال</span>
-                        {% else %}
-                            <span class="badge bg-secondary">غیرفعال</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ m.contract_date|default:"-" }}</td>
-                    <td>
-                        <a href="{% url 'movakel-detail' m.slug %}" class="btn btn-sm btn-outline-primary">مشاهده</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="text-center py-5 text-muted">
-        <p class="fs-5">❌ پرونده‌ای با این مشخصات یافت نشد</p>
-    </div>
-    {% endif %}
-    {% endif %}
+            <!-- نوار نتایج -->
+            <div class="results-bar">
+                <div class="results-count">
+                    <i class="fa fa-list-ul"></i>
+                    <strong>{{ result_count }}</strong>
+                    پرونده یافت شد
+                </div>
 
-</div>
+                {% if query %}
+                    <div class="active-filter">
+                        <i class="fa fa-search"></i>
+                        «{{ query }}»
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if movakels %}
+                <div class="results-table-wrapper">
+                    <div class="table-responsive">
+                        <table class="table table-clean table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>نام موکل</th>
+                                    <th>شماره مکانیزه</th>
+                                    <th>موبایل</th>
+                                    <th>دسته‌بندی</th>
+                                    <th>وضعیت</th>
+                                    <th>تاریخ وکالت</th>
+                                    <th class="no-print">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in movakels %}
+                                    <tr>
+                                        <td class="row-num">{{ forloop.counter }}</td>
+                                        <td>
+                                            <div class="user-cell">
+                                                {% if m.image %}
+                                                    <img src="{{ m.image.url }}" alt="{{ m.name }}" class="user-avatar-sm">
+                                                {% else %}
+                                                    <div class="user-avatar-sm avatar-fallback">
+                                                        {{ m.name|slice:":1" }}
+                                                    </div>
+                                                {% endif %}
+                                                <strong>{{ m.name }}</strong>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if m.mechanized_number %}
+                                                <span dir="ltr">{{ m.mechanized_number }}</span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if m.mobile_number %}
+                                                <span dir="ltr">{{ m.mobile_number }}</span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if m.category %}
+                                                <span class="badge-tag">{{ m.category }}</span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if m.is_active %}
+                                                <span class="badge-status badge-closed">
+                                                    <i class="fa fa-check-circle"></i> فعال
+                                                </span>
+                                            {% else %}
+                                                <span class="badge-status badge-archived">
+                                                    <i class="fa fa-times-circle"></i> غیرفعال
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if m.contract_date %}
+                                                {{ m.contract_date|to_jalali:"%Y/%m/%d" }}
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="row-edit-cell no-print">
+                                            <a href="{% url 'movakel-detail' m.slug %}"
+                                               class="btn btn-primary btn-xs"
+                                               title="مشاهده پرونده">
+                                                <i class="fa fa-eye"></i>
+                                                مشاهده
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state-full">
+                    <div class="empty-icon">
+                        <i class="fa fa-search-minus"></i>
+                    </div>
+                    <h3>پرونده‌ای یافت نشد</h3>
+                    <p class="text-muted">
+                        هیچ پرونده‌ای با مشخصات وارد شده پیدا نشد.<br>
+                        فیلترها را تغییر دهید و دوباره تلاش کنید.
+                    </p>
+                    <a href="{% url 'advanced_search' %}" class="btn btn-primary" style="margin-top: 16px;">
+                        <i class="fa fa-times"></i>
+                        پاک کردن فیلترها
+                    </a>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- حالت خالی — قبل از جستجو -->
+            <div class="search-placeholder">
+                <div class="placeholder-icon">
+                    <i class="fa fa-search"></i>
+                </div>
+                <h3>جستجو را شروع کنید</h3>
+                <p class="text-muted">
+                    از فیلترهای بالا برای یافتن پرونده‌های مورد نظر استفاده کنید.<br>
+                    می‌توانید بر اساس نام، موبایل، شماره پرونده، دسته‌بندی و تاریخ جستجو کنید.
+                </p>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
 {% endblock %}

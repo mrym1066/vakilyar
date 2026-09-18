@@ -1,19 +1,225 @@
 {% extends 'shared/_layout.html' %}
+{% load widget_tweaks %}
+
+{% block title %}ویرایش خدمات پرونده{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-folder-open"></i>
+                    <span>پرونده‌ها</span>
+                </a>
+            </li>
+            {% if service_type and service_type.movakel %}
+                <li>
+                    <a href="{% url 'movakel-detail' service_type.movakel.slug %}">
+                        <i class="fa fa-user"></i>
+                        <span>{{ service_type.movakel.name|truncatechars:20 }}</span>
+                    </a>
+                </li>
+            {% endif %}
+            <li class="active">
+                <i class="fa fa-cogs"></i>
+                <span>ویرایش خدمات پرونده</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i>
+            <span>بازگشت</span>
+        </button>
+    </div>
+</nav>
+{% endblock %}
 
 {% block content %}
+<section class="service-detail-section">
+    <div class="container">
 
-<h3>ویرایش خدمات پرونده</h3>
+        <!-- هدر -->
+        <div class="service-header">
+            <div class="service-header-info">
+                <div class="service-header-icon">
+                    <i class="fa fa-cogs"></i>
+                </div>
+                <div>
+                    <h1 class="service-title">ویرایش خدمات پرونده</h1>
+                    <p class="service-subtitle">
+                        {% if service_type and service_type.movakel %}
+                            <i class="fa fa-user"></i>
+                            <strong>{{ service_type.movakel.name }}</strong>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
 
-<form method="post">
+            {% if service_type and service_type.movakel %}
+                <div class="service-header-actions no-print">
+                    <a href="{% url 'movakel-detail' service_type.movakel.slug %}" class="btn-service-view">
+                        <i class="fa fa-eye"></i>
+                        <span>مشاهده پرونده</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
 
-    {% csrf_token %}
+        <!-- پیام‌ها -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-custom alert-custom-{{ message.tags }}">
+                    <i class="fa fa-info-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
 
-    {{ form.as_p }}
+        <!-- فرم -->
+        <form method="post" class="service-form" novalidate>
+            {% csrf_token %}
 
-    <button class="btn btn-success">
-        ذخیره تغییرات
-    </button>
+            <!-- بخش ۱: هزینه دادرسی -->
+            <div class="service-section-block">
+                <div class="service-section-header">
+                    <div class="service-section-icon service-icon-navy">
+                        <i class="fa fa-gavel"></i>
+                    </div>
+                    <div>
+                        <h3>هزینه دادرسی</h3>
+                        <p>هزینه‌های قانونی دادرسی</p>
+                    </div>
+                </div>
 
-</form>
+                <div class="service-section-body">
+                    <div class="row">
+                        {% for field in form %}
+                            {% if field.name == 'bill_fee' or field.name == 'initial_fee' or field.name == 'appeal_fee' or field.name == 'enforcement_fee' or field.name == 'petition_fee' %}
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="service-field">
+                                        <label class="service-label">
+                                            <i class="fa fa-circle-o"></i>
+                                            {{ field.label }}
+                                        </label>
+                                        {{ field|add_class:"form-control" }}
+                                        {% if field.errors %}
+                                            <div class="field-error">
+                                                <i class="fa fa-exclamation-triangle"></i>
+                                                {{ field.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
+            <!-- بخش ۲: هزینه‌های جانبی -->
+            <div class="service-section-block">
+                <div class="service-section-header">
+                    <div class="service-section-icon service-icon-gold">
+                        <i class="fa fa-money"></i>
+                    </div>
+                    <div>
+                        <h3>هزینه‌های جانبی</h3>
+                        <p>سفر، متفرقه، ابلاغیه و غیره</p>
+                    </div>
+                </div>
+
+                <div class="service-section-body">
+                    <div class="row">
+                        {% for field in form %}
+                            {% if field.name == 'travel_fee' or field.name == 'miscellaneous_fee' or field.name == 'contract_fee' or field.name == 'notification_fee' or field.name == 'court_service_fee' or field.name == 'document_fee' %}
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="service-field">
+                                        <label class="service-label">
+                                            <i class="fa fa-circle-o"></i>
+                                            {{ field.label }}
+                                        </label>
+                                        {{ field|add_class:"form-control" }}
+                                        {% if field.errors %}
+                                            <div class="field-error">
+                                                <i class="fa fa-exclamation-triangle"></i>
+                                                {{ field.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- بخش ۳: اختیارات وکیل (checkbox) -->
+            <div class="service-section-block">
+                <div class="service-section-header">
+                    <div class="service-section-icon service-icon-success">
+                        <i class="fa fa-briefcase"></i>
+                    </div>
+                    <div>
+                        <h3>اختیارات وکیل</h3>
+                        <p>خدماتی که انجام می‌شود</p>
+                    </div>
+                </div>
+
+                <div class="service-section-body">
+                    <div class="service-checkboxes-grid">
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                                <div class="service-checkbox-wrapper">
+                                    <label class="service-checkbox">
+                                        {{ field }}
+                                        <span class="service-checkbox-label">{{ field.label }}</span>
+                                    </label>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- دکمه‌ها -->
+            <div class="service-form-actions">
+                <button type="submit" class="btn-service-save">
+                    <i class="fa fa-save"></i>
+                    <span>ذخیره تغییرات</span>
+                </button>
+                {% if service_type and service_type.movakel %}
+                    <a href="{% url 'movakel-detail' service_type.movakel.slug %}" class="btn-service-cancel">
+                        <i class="fa fa-times"></i>
+                        <span>انصراف</span>
+                    </a>
+                {% else %}
+                    <button type="button" class="btn-service-cancel" onclick="history.back()">
+                        <i class="fa fa-times"></i>
+                        <span>انصراف</span>
+                    </button>
+                {% endif %}
+            </div>
+
+        </form>
+
+        <!-- راهنما -->
+        <div class="service-info-box">
+            <div class="info-icon">
+                <i class="fa fa-lightbulb-o"></i>
+            </div>
+            <div class="info-content">
+                <strong>راهنما:</strong>
+                برای فعال‌سازی هر خدمت، فیلد هزینه‌اش را پر کنید یا تیک آن را بزنید.
+                مبالغ را به <strong>تومان</strong> وارد کنید.
+            </div>
+        </div>
+
+    </div>
+</section>
 {% endblock %}

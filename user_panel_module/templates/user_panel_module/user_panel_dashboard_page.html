@@ -1,211 +1,364 @@
 {% extends 'shared/_layout.html' %}
-{% load render_partial %}
+{% load common_tags %}
+{% load humanize %}
 
 {% block title %}داشبورد{% endblock %}
 
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i><span>خانه</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-th-large"></i><span>داشبورد</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i><span>بازگشت</span>
+        </button>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
-<style>
-.dashboard-wrap { padding: 28px 0 48px; }
-.dash-sidebar { background:#fff; border-radius:12px; border:1px solid #E4E1D9; box-shadow:0 2px 8px rgba(27,42,74,0.07); overflow:hidden; }
-.dash-sidebar-header { background:#1B2A4A; padding:18px 16px; text-align:center; }
-.dash-sidebar-header .avatar { width:56px; height:56px; border-radius:50%; background:#C9A84C; color:#1B2A4A; font-size:22px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; border:3px solid rgba(255,255,255,0.2); }
-.dash-sidebar-header .username { color:#fff; font-size:14px; font-weight:600; margin:0; }
-.dash-sidebar-header .userrole { color:rgba(255,255,255,0.6); font-size:11px; margin-top:3px; }
-.dash-nav { list-style:none; padding:8px 0; margin:0; }
-.dash-nav li a { display:flex; align-items:center; gap:10px; padding:12px 18px; color:#5A5751; font-size:14px; font-weight:500; text-decoration:none; border-right:3px solid transparent; transition:all .18s; }
-.dash-nav li a:hover, .dash-nav li a.active { color:#1B2A4A; background:#F7F5F0; border-right-color:#C9A84C; }
-.dash-nav li a i { width:20px; text-align:center; color:#9B9890; font-size:15px; transition:color .18s; }
-.dash-nav li a:hover i, .dash-nav li a.active i { color:#C9A84C; }
-.dash-nav .divider { border-top:1px solid #E4E1D9; margin:6px 0; }
-.stat-card { background:#fff; border-radius:12px; border:1px solid #E4E1D9; padding:18px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 1px 4px rgba(27,42,74,0.07); margin-bottom:16px; transition:box-shadow .2s; }
-.stat-card:hover { box-shadow:0 4px 14px rgba(27,42,74,0.12); }
-.stat-card .icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-.stat-card .icon.navy { background:#E8EBF4; color:#1B2A4A; }
-.stat-card .icon.green { background:#D4F0E2; color:#0e5a2e; }
-.stat-card .icon.gray { background:#EEECEA; color:#5A5751; }
-.stat-card .icon.gold { background:#FBF0D6; color:#8a5e10; }
-.stat-card .value { font-size:26px; font-weight:700; color:#1B2A4A; line-height:1; }
-.stat-card .label { font-size:12px; color:#9B9890; margin-top:4px; }
-.finance-card { background:#fff; border-radius:12px; border:1px solid #E4E1D9; overflow:hidden; box-shadow:0 1px 4px rgba(27,42,74,0.07); margin-bottom:16px; }
-.finance-card .fc-header { padding:12px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; }
-.finance-card .fc-header.green { background:#1A7A4A; color:#fff; }
-.finance-card .fc-header.navy { background:#1B2A4A; color:#fff; }
-.finance-card .fc-body { padding:20px; text-align:center; }
-.finance-card .fc-amount { font-size:28px; font-weight:700; color:#1B2A4A; line-height:1; }
-.finance-card .fc-unit { font-size:13px; color:#9B9890; margin-top:6px; }
-.dash-card { background:#fff; border-radius:12px; border:1px solid #E4E1D9; overflow:hidden; box-shadow:0 1px 4px rgba(27,42,74,0.07); margin-bottom:20px; }
-.dash-card .dc-header { padding:13px 18px; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:space-between; }
-.dash-card .dc-header.red { background:#B52828; color:#fff; }
-.dash-card .dc-header.teal { background:#1A6A7A; color:#fff; }
-.dash-card .dc-header.dark { background:#1B2A4A; color:#fff; }
-.dash-card .dc-header .bc { background:rgba(255,255,255,0.25); color:#fff; border-radius:20px; padding:2px 10px; font-size:12px; }
-.dc-empty { padding:28px; text-align:center; color:#9B9890; font-size:14px; }
-.dc-empty i { font-size:32px; display:block; margin-bottom:10px; color:#C9A84C; }
-.dash-table { width:100%; border-collapse:collapse; font-size:13px; }
-.dash-table thead tr { background:#F7F5F0; }
-.dash-table thead th { padding:10px 14px; font-weight:600; color:#5A5751; text-align:right; border-bottom:1px solid #E4E1D9; white-space:nowrap; }
-.dash-table tbody tr { border-bottom:1px solid #F1EFF9; transition:background .15s; }
-.dash-table tbody tr:last-child { border:none; }
-.dash-table tbody tr:hover { background:#F7F5F0; }
-.dash-table td { padding:10px 14px; color:#2E2C28; vertical-align:middle; }
-.dash-table .tr-today { background:#FBF0D6 !important; }
-.btn-view { background:#1B2A4A; color:#fff !important; border:none; border-radius:5px; padding:4px 12px; font-size:12px; font-weight:600; font-family:'Vazirmatn',Tahoma,sans-serif; text-decoration:none; display:inline-block; transition:background .15s; }
-.btn-view:hover { background:#243660; color:#F0D080 !important; text-decoration:none; }
-.badge-active { background:#D4F0E2; color:#0e5a2e; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:600; display:inline-block; }
-.badge-inactive { background:#EEECEA; color:#5A5751; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:600; display:inline-block; }
-.dash-page-title { font-size:18px; font-weight:700; color:#1B2A4A; margin:0 0 22px; display:flex; align-items:center; gap:10px; }
-.dash-page-title span { color:#C9A84C; font-size:20px; }
-</style>
+<section class="dashboard-section">
+    <div class="container">
+        <div class="row">
 
-<div class="container-fluid dashboard-wrap" dir="rtl">
-  <div class="row">
+            <!-- ═══ سایدبار ═══ -->
+            <div class="col-md-3 col-sm-4">
+                <aside class="user-panel-sidebar">
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-avatar">
+                            {{ request.user.first_name|first|default:request.user.username|first }}
+                        </div>
+                        <div class="sidebar-username">
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </div>
+                        <div class="sidebar-userrole">
+                            <i class="fa fa-user-circle"></i>
+                            {% if request.user.is_superuser %}مدیر سیستم{% else %}کاربر{% endif %}
+                        </div>
+                    </div>
 
-    <!-- سایدبار -->
-    <div class="col-md-2" style="padding-left:8px;">
-      <div class="dash-sidebar">
-        <div class="dash-sidebar-header">
-          <div class="avatar">{{ request.user.first_name|first|default:request.user.username|first }}</div>
-          <div class="username">{{ request.user.get_full_name|default:request.user.username }}</div>
-          <div class="userrole">کاربر سیستم</div>
-        </div>
-        <ul class="dash-nav">
-          <li><a href="{% url 'user_panel_dashboard' %}" class="active"><i class="fa fa-th-large"></i> داشبورد</a></li>
-          <li><a href="{% url 'edit_profile_page' %}"><i class="fa fa-user-circle"></i> ویرایش اطلاعات</a></li>
-          <li><a href="{% url 'change_password_page' %}"><i class="fa fa-lock"></i> تغییر رمز عبور</a></li>
-          <li class="divider"></li>
-          <li><a href="{% url 'movakel-list' %}"><i class="fa fa-folder-open"></i> پرونده‌ها</a></li>
-          <li><a href="{% url 'meeting_list' %}"><i class="fa fa-calendar"></i> ملاقات‌ها</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- محتوا -->
-    <div class="col-md-10" style="padding-right:12px;">
-
-      <div class="dash-page-title">
-        <span><i class="fa fa-bar-chart"></i></span>
-        داشبورد مدیریت پرونده‌ها
-      </div>
-
-      <!-- آمار -->
-      <div class="row">
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="icon navy"><i class="fa fa-folder"></i></div>
-            <div><div class="value">{{ total_movakels|default:"—" }}</div><div class="label">کل پرونده‌ها</div></div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="icon green"><i class="fa fa-check-circle"></i></div>
-            <div><div class="value">{{ active_movakels|default:"—" }}</div><div class="label">پرونده‌های فعال</div></div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="icon gray"><i class="fa fa-archive"></i></div>
-            <div><div class="value">{{ inactive_movakels|default:"—" }}</div><div class="label">غیرفعال</div></div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="icon gold"><i class="fa fa-calendar-check-o"></i></div>
-            <div><div class="value">{{ pending_meetings|default:"—" }}</div><div class="label">درخواست ملاقات</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- مالی -->
-      <div class="row" style="margin-bottom:4px;">
-        <div class="col-md-6">
-          <div class="finance-card">
-            <div class="fc-header green"><i class="fa fa-money"></i> درآمد ماه جاری</div>
-            <div class="fc-body">
-              <div class="fc-amount">{% if monthly_income %}{{ monthly_income|floatformat:0 }}{% else %}۰{% endif %}</div>
-              <div class="fc-unit">تومان</div>
+                    <ul class="sidebar-nav">
+                        <li class="active">
+                            <a href="{% url 'user_panel_dashboard' %}">
+                                <i class="fa fa-th-large"></i>
+                                <span>داشبورد</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'edit_profile_page' %}">
+                                <i class="fa fa-user-circle"></i>
+                                <span>ویرایش اطلاعات</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'change_password_page' %}">
+                                <i class="fa fa-lock"></i>
+                                <span>تغییر رمز عبور</span>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{% url 'movakel-list' %}">
+                                <i class="fa fa-folder-open"></i>
+                                <span>پرونده‌ها</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'meeting_list' %}">
+                                <i class="fa fa-calendar"></i>
+                                <span>ملاقات‌ها</span>
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
             </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="finance-card">
-            <div class="fc-header navy"><i class="fa fa-briefcase"></i> کل درآمد</div>
-            <div class="fc-body">
-              <div class="fc-amount">{% if total_income %}{{ total_income|floatformat:0 }}{% else %}۰{% endif %}</div>
-              <div class="fc-unit">تومان</div>
+
+            <!-- ═══ محتوا ═══ -->
+            <div class="col-md-9 col-sm-8">
+
+                {% if request.user.is_superuser %}
+                    <div class="dash-page-title">
+                        <span><i class="fa fa-bar-chart"></i></span>
+                        داشبورد مدیریت پرونده‌ها
+                    </div>
+                {% else %}
+                    <div class="dash-page-title">
+                        <span><i class="fa fa-th-large"></i></span>
+                        پنل کاربری من
+                    </div>
+                {% endif %}
+
+                <!-- ═══ کارت‌های آماری ═══ -->
+                <div class="dashboard-stats">
+                    <div class="dash-stat-card stat-navy">
+                        <div class="dash-stat-icon">
+                            <i class="fa fa-folder"></i>
+                        </div>
+                        <div class="dash-stat-body">
+                            <div class="dash-stat-value">{{ total_movakels|default:"—" }}</div>
+                            <div class="dash-stat-label">کل پرونده‌ها</div>
+                        </div>
+                    </div>
+
+                    <div class="dash-stat-card stat-green">
+                        <div class="dash-stat-icon">
+                            <i class="fa fa-check-circle"></i>
+                        </div>
+                        <div class="dash-stat-body">
+                            <div class="dash-stat-value">{{ active_movakels|default:"—" }}</div>
+                            <div class="dash-stat-label">پرونده‌های فعال</div>
+                        </div>
+                    </div>
+
+                    <div class="dash-stat-card stat-gray">
+                        <div class="dash-stat-icon">
+                            <i class="fa fa-archive"></i>
+                        </div>
+                        <div class="dash-stat-body">
+                            <div class="dash-stat-value">{{ inactive_movakels|default:"—" }}</div>
+                            <div class="dash-stat-label">غیرفعال</div>
+                        </div>
+                    </div>
+
+                    <div class="dash-stat-card stat-gold">
+                        <div class="dash-stat-icon">
+                            <i class="fa fa-calendar-check-o"></i>
+                        </div>
+                        <div class="dash-stat-body">
+                            <div class="dash-stat-value">{{ pending_meetings|default:"—" }}</div>
+                            <div class="dash-stat-label">درخواست ملاقات</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ کارت‌های مالی ═══ -->
+                {% if request.user.is_superuser %}
+                <div class="dashboard-finance">
+                    <div class="finance-card">
+                        <div class="finance-header finance-header-green">
+                            <i class="fa fa-money"></i>
+                            درآمد ماه جاری
+                        </div>
+                        <div class="finance-body">
+                            <div class="finance-amount">
+                                {% if monthly_income %}{{ monthly_income|floatformat:0 }}{% else %}۰{% endif %}
+                            </div>
+                            <div class="finance-unit">تومان</div>
+                        </div>
+                    </div>
+
+                    <div class="finance-card">
+                        <div class="finance-header finance-header-navy">
+                            <i class="fa fa-briefcase"></i>
+                            کل درآمد
+                        </div>
+                        <div class="finance-body">
+                            <div class="finance-amount">
+                                {% if total_income %}{{ total_income|floatformat:0 }}{% else %}۰{% endif %}
+                            </div>
+                            <div class="finance-unit">تومان</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ═══ جلسات امروز ═══ -->
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header dashboard-card-header-red">
+                        <span>
+                            <i class="fa fa-gavel"></i>
+                            جلسات امروز
+                        </span>
+                        {% if today_hearings %}
+                            <span class="dashboard-badge">{{ today_hearings }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="dashboard-card-body">
+                        {% if today_hearing_list %}
+                            <div class="table-responsive">
+                                <table class="dash-table">
+                                    <thead>
+                                        <tr>
+                                            <th>نام موکل</th>
+                                            <th>شماره مکانیزه</th>
+                                            <th>زمان</th>
+                                            <th class="no-print">عملیات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for m in today_hearing_list %}
+                                            <tr class="tr-today">
+                                                <td><strong>{{ m.name }}</strong></td>
+                                                <td>
+                                                    {% if m.mechanized_number %}
+                                                        <span dir="ltr">{{ m.mechanized_number }}</span>
+                                                    {% else %}
+                                                        —
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if m.hearing_time %}
+                                                        <span class="time-badge time-badge-danger">
+                                                            <i class="fa fa-clock-o"></i>
+                                                            {{ m.hearing_time|time:"H:i" }}
+                                                        </span>
+                                                    {% else %}
+                                                        —
+                                                    {% endif %}
+                                                </td>
+                                                <td class="no-print">
+                                                    <a href="{% url 'movakel-detail' m.slug %}" class="btn-view">
+                                                        <i class="fa fa-eye"></i> مشاهده
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="dashboard-empty dashboard-empty-success">
+                                <i class="fa fa-check-circle"></i>
+                                <p>امروز جلسه‌ای ندارید</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- ═══ جلسات هفته ═══ -->
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header dashboard-card-header-teal">
+                        <span>
+                            <i class="fa fa-calendar"></i>
+                            جلسات هفته جاری
+                        </span>
+                    </div>
+                    <div class="dashboard-card-body">
+                        {% if week_hearings %}
+                            <div class="table-responsive">
+                                <table class="dash-table">
+                                    <thead>
+                                        <tr>
+                                            <th>نام موکل</th>
+                                            <th>تاریخ</th>
+                                            <th>زمان</th>
+                                            <th class="no-print">عملیات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for m in week_hearings %}
+                                            <tr {% if m.hearing_date == today %}class="tr-today"{% endif %}>
+                                                <td><strong>{{ m.name }}</strong></td>
+                                                <td>
+                                                    {% if m.hearing_date %}
+                                                        <span class="date-badge">
+                                                            <i class="fa fa-calendar"></i>
+                                                            {{ m.hearing_date|jalali_date }}
+                                                        </span>
+                                                    {% else %}
+                                                        —
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ m.hearing_time|time:"H:i"|default:"—" }}</td>
+                                                <td class="no-print">
+                                                    <a href="{% url 'movakel-detail' m.slug %}" class="btn-view">
+                                                        <i class="fa fa-eye"></i> مشاهده
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="dashboard-empty">
+                                <i class="fa fa-calendar-check-o"></i>
+                                <p>این هفته جلسه‌ای ثبت نشده</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- ═══ آخرین پرونده‌ها ═══ -->
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header dashboard-card-header-navy">
+                        <span>
+                            <i class="fa fa-folder-open"></i>
+                            آخرین پرونده‌های ثبت‌شده
+                        </span>
+                    </div>
+                    <div class="dashboard-card-body">
+                        {% if latest_movakels %}
+                            <div class="table-responsive">
+                                <table class="dash-table">
+                                    <thead>
+                                        <tr>
+                                            <th>نام موکل</th>
+                                            <th>شماره مکانیزه</th>
+                                            <th>وضعیت</th>
+                                            <th class="no-print">عملیات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for m in latest_movakels %}
+                                            <tr>
+                                                <td>
+                                                    <div class="user-cell">
+                                                        {% if m.image %}
+                                                            <img src="{{ m.image.url }}" alt="{{ m.name }}" class="user-avatar-sm">
+                                                        {% else %}
+                                                            <div class="user-avatar-sm avatar-fallback">{{ m.name|slice:":1" }}</div>
+                                                        {% endif %}
+                                                        <strong>{{ m.name }}</strong>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {% if m.mechanized_number %}
+                                                        <span dir="ltr">{{ m.mechanized_number }}</span>
+                                                    {% else %}
+                                                        —
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if m.is_active %}
+                                                        <span class="badge-status badge-closed">
+                                                            <i class="fa fa-check-circle"></i> فعال
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge-status badge-archived">
+                                                            <i class="fa fa-times-circle"></i> غیرفعال
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="no-print">
+                                                    <a href="{% url 'movakel-detail' m.slug %}" class="btn-view">
+                                                        <i class="fa fa-eye"></i> مشاهده
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="dashboard-empty">
+                                <i class="fa fa-folder"></i>
+                                <p>هنوز پرونده‌ای ثبت نشده</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
             </div>
-          </div>
         </div>
-      </div>
-
-      <!-- جلسات امروز -->
-      <div class="dash-card">
-        <div class="dc-header red">
-          <span><i class="fa fa-gavel" style="margin-left:6px;"></i>جلسات امروز</span>
-          {% if today_hearings %}<span class="bc">{{ today_hearings }}</span>{% endif %}
-        </div>
-        <div class="dc-body">
-          {% if today_hearing_list %}
-            <table class="dash-table">
-              <thead><tr><th>نام موکل</th><th>شماره مکانیزه</th><th>زمان</th><th>عملیات</th></tr></thead>
-              <tbody>
-                {% for m in today_hearing_list %}
-                <tr><td><strong>{{ m.name }}</strong></td><td>{{ m.mechanized_number|default:"—" }}</td><td>{{ m.hearing_time|default:"—" }}</td><td><a href="{% url 'movakel-detail' m.slug %}" class="btn-view">مشاهده</a></td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <div class="dc-empty"><i class="fa fa-check-circle"></i>امروز جلسه‌ای ندارید</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- جلسات هفته -->
-      <div class="dash-card">
-        <div class="dc-header teal"><span><i class="fa fa-calendar" style="margin-left:6px;"></i>جلسات هفته جاری</span></div>
-        <div class="dc-body">
-          {% if week_hearings %}
-            <table class="dash-table">
-              <thead><tr><th>نام موکل</th><th>تاریخ</th><th>زمان</th><th>عملیات</th></tr></thead>
-              <tbody>
-                {% for m in week_hearings %}
-                <tr {% if m.hearing_date == today %}class="tr-today"{% endif %}>
-                  <td><strong>{{ m.name }}</strong></td><td>{{ m.hearing_date }}</td><td>{{ m.hearing_time|default:"—" }}</td>
-                  <td><a href="{% url 'movakel-detail' m.slug %}" class="btn-view">مشاهده</a></td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <div class="dc-empty"><i class="fa fa-calendar-check-o"></i>این هفته جلسه‌ای ثبت نشده</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- آخرین پرونده‌ها -->
-      <div class="dash-card">
-        <div class="dc-header dark"><span><i class="fa fa-folder-open" style="margin-left:6px;"></i>آخرین پرونده‌های ثبت‌شده</span></div>
-        <div class="dc-body">
-          {% if latest_movakels %}
-            <table class="dash-table">
-              <thead><tr><th>نام موکل</th><th>شماره مکانیزه</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-              <tbody>
-                {% for m in latest_movakels %}
-                <tr>
-                  <td><strong>{{ m.name }}</strong></td>
-                  <td>{{ m.mechanized_number|default:"—" }}</td>
-                  <td>{% if m.is_active %}<span class="badge-active">فعال</span>{% else %}<span class="badge-inactive">غیرفعال</span>{% endif %}</td>
-                  <td><a href="{% url 'movakel-detail' m.slug %}" class="btn-view">مشاهده</a></td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <div class="dc-empty"><i class="fa fa-folder"></i>هنوز پرونده‌ای ثبت نشده</div>
-          {% endif %}
-        </div>
-      </div>
-
     </div>
-  </div>
-</div>
+</section>
 {% endblock %}

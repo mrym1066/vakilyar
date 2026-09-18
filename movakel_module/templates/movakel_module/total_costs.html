@@ -1,72 +1,226 @@
 {% extends 'shared/_layout.html' %}
-
 {% load humanize %}
 
+{% block title %}گزارش مالی{% endblock %}
 
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-bar-chart"></i>
+                <span>گزارش مالی</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i>
+            <span>بازگشت</span>
+        </button>
+    </div>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="text-center mb-4">📊 گزارش مالی</h2>
+<section class="financial-report-section">
+    <div class="container">
 
-    <div class="row">
-        <!-- 🔹 جدول خلاصه هزینه‌ها -->
-        <div class="col-md-6">
-            <table class="table table-bordered table-hover shadow-sm">
-                <thead class="table-dark text-center">
-                    <tr>
-                        <th>📌 عنوان</th>
-                        <th>💰 مقدار (تومان)</th>
-                    </tr>
-                </thead>
-                <tbody class="text-center">
-                    <tr>
-                        <td>💵 مجموع مبلغ توافق شده</td>
-                        <td>{{ total_total_amount|intcomma }}</td>
-                    </tr>
-                    <tr>
-                        <td>✅ مجموع مبلغ دریافت شده</td>
-                        <td class="text-success">{{ total_received_amount|intcomma }}</td>
-                    </tr>
-                    <tr>
-                        <td>⚠️ مجموع مبلغ باقی‌مانده</td>
-                        <td class="text-danger">{{ total_remaining_amount|intcomma }}</td>
-                    </tr>
-                    <tr>
-                        <td>📑 مجموع هزینه‌های خدمات</td>
-                        <td>{{ total_service_cost|intcomma }}</td>
-                    </tr>
-                    <tr class="table-info">
-                        <td>💳 مجموع پرداختی‌ها</td>
-                        <td>{{ total_payments|intcomma }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- ═══ هدر صفحه ═══ -->
+        <div class="report-header">
+            <div class="report-header-info">
+                <div class="report-header-icon">
+                    <i class="fa fa-bar-chart"></i>
+                </div>
+                <div>
+                    <h1 class="report-title">گزارش مالی کلی</h1>
+                    <p class="report-subtitle">
+                        خلاصه درآمد، هزینه‌ها و پرداخت‌ها
+                    </p>
+
+                </div>
+            </div>
+            <div class="report-header-actions no-print">
+                <button type="button" class="btn-report-print" onclick="window.print()">
+                    <i class="fa fa-print"></i>
+                    <span>چاپ گزارش</span>
+                </button>
+                <a href="{% url 'pdf_total_report' %}"
+                    target="_blank"
+                    class="btn btn-primary">
+                        <i class="fa fa-file-pdf-o"></i>
+                    دانلود PDF
+                </a>
+            </div>
         </div>
 
-        <!-- 🔹 جدول جزئیات پرداختی‌ها -->
-        <div class="col-md-6">
-            <h4 class="text-center mt-3">💲 جزئیات پرداختی‌ها بر اساس نوع هزینه</h4>
-            <table class="table table-striped table-hover shadow-sm">
-                <thead class="table-primary text-center">
-                    <tr>
-                        <th>🔍 نوع هزینه</th>
-                        <th>💸 مجموع پرداختی</th>
-                    </tr>
-                </thead>
-                <tbody class="text-center">
-                    {% for item in payments_by_category %}
-                    <tr>
-                        <td>{{ item.get_payment_for_display }}</td>
-                        <td>{{ item.total|intcomma }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="2" class="text-muted">هیچ پرداختی ثبت نشده است.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- ═══ کارت‌های آماری بالا ═══ -->
+        <div class="report-stats-grid">
+
+            <div class="report-stat-card stat-navy">
+                <div class="report-stat-icon">
+                    <i class="fa fa-file-text-o"></i>
+                </div>
+                <div class="report-stat-body">
+                    <div class="report-stat-value">{{ total_total_amount|intcomma }}</div>
+                    <div class="report-stat-label">مجموع مبلغ توافق شده</div>
+                    <div class="report-stat-unit">تومان</div>
+                </div>
+            </div>
+
+            <div class="report-stat-card stat-success">
+                <div class="report-stat-icon">
+                    <i class="fa fa-check-circle"></i>
+                </div>
+                <div class="report-stat-body">
+                    <div class="report-stat-value">{{ total_received_amount|intcomma }}</div>
+                    <div class="report-stat-label">مجموع مبلغ دریافت شده</div>
+                    <div class="report-stat-unit">تومان</div>
+                </div>
+            </div>
+
+            <div class="report-stat-card stat-danger">
+                <div class="report-stat-icon">
+                    <i class="fa fa-exclamation-circle"></i>
+                </div>
+                <div class="report-stat-body">
+                    <div class="report-stat-value">{{ total_remaining_amount|intcomma }}</div>
+                    <div class="report-stat-label">مجموع مبلغ باقی‌مانده</div>
+                    <div class="report-stat-unit">تومان</div>
+                </div>
+            </div>
+
+            <div class="report-stat-card stat-info">
+                <div class="report-stat-icon">
+                    <i class="fa fa-credit-card"></i>
+                </div>
+                <div class="report-stat-body">
+                    <div class="report-stat-value">{{ total_payments|intcomma }}</div>
+                    <div class="report-stat-label">مجموع پرداختی‌ها</div>
+                    <div class="report-stat-unit">تومان</div>
+                </div>
+            </div>
+
         </div>
+
+        <!-- ═══ دو جدول کنار هم ═══ -->
+        <div class="row">
+
+            <!-- جدول خلاصه هزینه‌ها -->
+            <div class="col-md-6 col-sm-12">
+                <div class="report-table-card">
+                    <div class="report-table-header">
+                        <i class="fa fa-list-alt"></i>
+                        <h3>خلاصه هزینه‌ها</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-clean">
+                            <thead>
+                                <tr>
+                                    <th>عنوان</th>
+                                    <th>مقدار (تومان)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <i class="fa fa-money report-icon report-icon-navy"></i>
+                                        مجموع مبلغ توافق شده
+                                    </td>
+                                    <td class="money-cell">{{ total_total_amount|intcomma }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="fa fa-check-circle report-icon report-icon-success"></i>
+                                        مجموع مبلغ دریافت شده
+                                    </td>
+                                    <td class="money-cell text-success">{{ total_received_amount|intcomma }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="fa fa-exclamation-circle report-icon report-icon-danger"></i>
+                                        مجموع مبلغ باقی‌مانده
+                                    </td>
+                                    <td class="money-cell text-danger">{{ total_remaining_amount|intcomma }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="fa fa-briefcase report-icon report-icon-info"></i>
+                                        مجموع هزینه‌های خدمات
+                                    </td>
+                                    <td class="money-cell">{{ total_service_cost|intcomma }}</td>
+                                </tr>
+                                <tr class="report-row-highlight">
+                                    <td>
+                                        <i class="fa fa-credit-card report-icon report-icon-gold"></i>
+                                        مجموع پرداختی‌ها
+                                    </td>
+                                    <td class="money-cell">{{ total_payments|intcomma }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول جزئیات پرداختی‌ها -->
+            <div class="col-md-6 col-sm-12">
+                <div class="report-table-card">
+                    <div class="report-table-header">
+                        <i class="fa fa-pie-chart"></i>
+                        <h3>جزئیات پرداختی‌ها بر اساس نوع هزینه</h3>
+                    </div>
+
+                    {% if payments_by_category %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                    <tr>
+                                        <th>نوع هزینه</th>
+                                        <th>مجموع پرداختی</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in payments_by_category %}
+                                        <tr>
+                                            <td>
+                                                <i class="fa fa-tag report-icon report-icon-navy"></i>
+                                                {{ item.get_payment_for_display }}
+                                            </td>
+                                            <td class="money-cell">{{ item.total|intcomma }} تومان</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state-sm">
+                            <i class="fa fa-pie-chart"></i>
+                            <h3>هنوز پرداختی ثبت نشده</h3>
+                            <p>پس از ثبت پرداخت‌ها، جزئیات در این بخش نمایش داده می‌شود.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ═══ باکس راهنما ═══ -->
+        <div class="report-info-box">
+            <div class="info-icon">
+                <i class="fa fa-info-circle"></i>
+            </div>
+            <div class="info-content">
+                <strong>توجه:</strong>
+                این گزارش، خلاصه‌ای از مجموع مبالغ توافق شده، دریافتی‌ها و باقی‌مانده‌ها در تمام پرونده‌های فعال است.
+                برای مشاهده جزئیات هر پرونده، به صفحه پرونده مراجعه کنید.
+            </div>
+        </div>
+
     </div>
-</div>
+</section>
 {% endblock %}

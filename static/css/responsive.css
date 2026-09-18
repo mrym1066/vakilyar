@@ -1,346 +1,955 @@
-/* ============================================================
-   وکیل‌یار — responsive.css (نسخه تمیز)
-   ============================================================ */
+﻿/* ===========================================================
+   Vakilyar - responsive.css
+   Only Media Queries - v2.0.0
+   =========================================================== */
 
-/* ── پایه ── */
+/* ===== Base Fixes ===== */
+
 * {
-    box-sizing: border-box !important;
+    box-sizing: border-box;
 }
+
 html,
 body {
-    overflow-x: hidden !important;
-    max-width: 100% !important;
+    overflow-x: hidden;
+    max-width: 100%;
 }
+
 img {
-    max-width: 100% !important;
-    height: auto !important;
+    max-width: 100%;
+    height: auto;
 }
+
 body {
-    direction: rtl !important;
-    text-align: right !important;
+    direction: rtl;
+    text-align: right;
 }
 
-/* ── RTL fix برای Bootstrap ── */
-.pull-right {
-    float: right !important;
-}
-.pull-left {
-    float: left !important;
-}
-.text-right {
-    text-align: right !important;
-}
-.text-left {
-    text-align: left !important;
-}
+.pull-right { float: right !important; }
+.pull-left  { float: left !important; }
+.text-right { text-align: right !important; }
+.text-left  { text-align: left !important; }
 
-/* ── جدول ریسپانسیو ── */
 .table-responsive {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    width: 100% !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
 }
 
-/* ── همبرگر ── */
 .navbar-toggle {
-    display: none !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 5px !important;
-    padding: 8px 10px !important;
-    cursor: pointer !important;
-    float: left !important;
-    margin: 8px 4px !important;
-}
-.navbar-toggle .icon-bar {
-    display: block !important;
-    width: 22px !important;
-    height: 2px !important;
-    background: #fff !important;
-    border-radius: 2px !important;
-    margin: 5px 0 !important;
+    display: none;
 }
 
-/* ══════════════════════════════════
-   Tablet  ≤ 991px
-══════════════════════════════════ */
+/* ===== Tablet - max-width 991px ===== */
+
 @media (max-width: 991px) {
-
-    /* مخفی کردن هدر بالایی */
-    .header_top {
-        display: none !important;
+    .container {
+        padding-right: 15px;
+        padding-left: 15px;
     }
 
-    /* هدر میانی */
-    .header-middle .col-sm-4,
-    .header-middle .col-sm-6,
-    .header-middle .col-sm-8 {
-        width: 100% !important;
-        float: none !important;
-        text-align: center !important;
+    .header-middle .row {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
     }
 
-    .header-middle .shop-menu {
-        float: none !important;
-        text-align: center !important;
-    }
-    .header-middle .shop-menu .nav {
-        display: inline-flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 6px !important;
-        padding: 6px 0 !important;
-    }
-    .header-middle .shop-menu .nav li a {
-        font-size: 12px !important;
-        padding: 6px 12px !important;
-        background: #F1EFF9 !important;
-        border-radius: 5px !important;
-        color: #1B2A4A !important;
-        font-weight: 600 !important;
+    .header-middle .logo a {
+        align-items: center;
     }
 
-    /* همبرگر */
+    .header-middle .logo-subtitle {
+        margin-right: 0;
+        text-align: center;
+    }
+
+    .header-user-box {
+        justify-content: center;
+        padding: 8px 0;
+    }
+
+    .header-bottom .main-nav {
+        min-height: auto;
+        padding: 6px 0;
+    }
+
     .navbar-toggle {
-        display: block !important;
+        display: block;
+        float: left;
+        margin: 8px 0;
     }
 
-    .header-bottom .col-sm-3,
-    .header-bottom .col-sm-9 {
-        width: 50% !important;
-        float: right !important;
-        padding: 0 8px !important;
-    }
-
-    /* جستجو */
-    .search_box input {
-        width: 100% !important;
-        padding: 8px 12px !important;
-        font-size: 13px !important;
-        border-radius: 5px !important;
-        background: rgba(255, 255, 255, 0.12) !important;
-        border: 1px solid rgba(255, 255, 255, 0.25) !important;
-        color: #fff !important;
-    }
-
-    /* منو */
-    .mainmenu .navbar-collapse:not(.in) {
+    .mainmenu.mainmenu-collapse {
         display: none !important;
     }
-    .mainmenu .navbar-collapse.in {
+
+    .mainmenu.mainmenu-collapse.in {
         display: block !important;
     }
-    .mainmenu {
-        width: 100% !important;
-        float: none !important;
-    }
-    .mainmenu ul {
-        flex-direction: column !important;
-        width: 100% !important;
-        background: #243660 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    .mainmenu ul li {
-        width: 100% !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-        float: none !important;
-    }
-    .mainmenu ul li a {
-        padding: 13px 20px !important;
-        display: block !important;
-        border-bottom: none !important;
-        font-size: 14px !important;
+
+    .header-bottom .mainmenu .nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        width: 100%;
+        background: #243660;
+        border-radius: 10px;
+        padding: 6px;
+        margin-top: 6px;
     }
 
-    /* کارت‌ها */
-    .col-sm-4 {
-        width: 50% !important;
-        float: right !important;
+    .header-bottom .mainmenu .nav li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* فوتر */
-    .footer-widget .col-sm-3 {
-        width: 50% !important;
-        float: right !important;
+    .header-bottom .mainmenu .nav li:last-child {
+        border-bottom: none;
+    }
+
+    .header-bottom .mainmenu .nav li a {
+        height: auto;
+        padding: 13px 20px;
+        border-radius: 0;
+        justify-content: flex-start;
+    }
+
+    .stats-grid,
+    .dashboard-stats,
+    .financial-stats-grid,
+    .financial-summary,
+    .court-info-cards,
+    .calendar-stats,
+    .backup-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-finance {
+        grid-template-columns: 1fr;
+    }
+
+    .movakel-sidebar,
+    .user-panel-sidebar {
+        position: static;
+        margin-top: 24px;
+    }
+
+    .recommended_items .carousel-inner {
+        padding: 0 20px;
+    }
+
+    .shop-details-tab .nav-tabs > li > a {
+        padding: 14px 16px;
+        font-size: 12.5px;
+    }
+
+    .site-footer {
+        text-align: center;
+    }
+
+    .footer-widget h4 {
+        justify-content: center;
+    }
+
+    .footer-widget h4::after {
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    .footer-links a,
+    .footer-contact li {
+        justify-content: center;
+    }
+
+    .footer-social {
+        justify-content: center;
     }
 }
 
-/* ══════════════════════════════════
-   Mobile  ≤ 767px
-══════════════════════════════════ */
+/* ===== Mobile - max-width 767px ===== */
+
 @media (max-width: 767px) {
-
     body {
-        font-size: 14px !important;
-    }
-
-    /* همه ستون‌ها تک‌ستونه */
-    [class*="col-sm-"],
-    [class*="col-md-"],
-    [class*="col-lg-"] {
-        width: 100% !important;
-        float: none !important;
-        padding-right: 10px !important;
-        padding-left: 10px !important;
+        font-size: 14px;
     }
 
     .container {
-        padding-right: 10px !important;
-        padding-left: 10px !important;
+        padding-right: 12px;
+        padding-left: 12px;
     }
+
     .row {
-        margin-right: -10px !important;
-        margin-left: -10px !important;
+        margin-right: -10px;
+        margin-left: -10px;
     }
 
-    /* هدر */
-    .header-bottom .col-sm-3,
-    .header-bottom .col-sm-9 {
-        width: 100% !important;
-        float: none !important;
-    }
-    .search_box {
-        padding: 8px 0 6px !important;
-    }
-    .navbar-header {
-        text-align: left !important;
-        padding: 6px 0 !important;
-    }
-    .mainmenu {
-        float: none !important;
-        width: 100% !important;
+    [class*="col-sm-offset-"],
+    [class*="col-md-offset-"],
+    [class*="col-lg-offset-"],
+    [class*="col-xs-offset-"] {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
-    /* کارت موکل */
-    .movakel-image-wrapper {
-        margin-bottom: 14px !important;
-    }
-    .movakelinfo {
-        padding: 14px 10px 10px !important;
-    }
-    .movakelinfo h2 {
-        font-size: 15px !important;
-    }
-    .movakelinfo p {
-        font-size: 12px !important;
-    }
-    .movakel-overlay {
-        display: none !important;
+    .stats-grid,
+    .dashboard-stats,
+    .financial-stats-grid,
+    .financial-summary,
+    .court-info-cards,
+    .calendar-stats,
+    .backup-stats,
+    .dashboard-finance {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    /* عنوان */
-    h2.title {
-        font-size: 17px !important;
-        margin: 18px 0 12px !important;
+    h1, .h1 { font-size: 22px; }
+    h2, .h2 { font-size: 18px; }
+    h3, .h3 { font-size: 16px; }
+
+    .title {
+        font-size: 17px;
+        margin: 18px 0 12px;
     }
 
-    /* فرم ورود */
-    .signup-form {
-        margin: 14px 8px !important;
-        padding: 20px 14px !important;
-        border-radius: 8px !important;
-    }
-    .signup-form h2 {
-        font-size: 18px !important;
+    .page-title { font-size: 18px; }
+    .year-title { font-size: 16px; }
+
+    .stat-card,
+    .dash-stat-card,
+    .financial-stat-card,
+    .calendar-stats .stat-card {
+        padding: 14px 16px;
     }
 
-    /* دکمه‌ها */
+    .stat-icon,
+    .dash-stat-icon,
+    .stat-card-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .stat-value,
+    .dash-stat-value,
+    .stat-card-value { font-size: 20px; }
+
+    .stat-card-label,
+    .dash-stat-label,
+    .stat-label { font-size: 11.5px; }
+
+    .finance-amount { font-size: 24px; }
+
     .btn {
-        font-size: 12px !important;
-        padding: 7px 12px !important;
+        padding: 8px 14px;
+        font-size: 12.5px;
     }
 
-    /* صفحه‌بندی */
+    .btn i { font-size: 12px; }
+
+    .btn-lg {
+        padding: 11px 22px;
+        font-size: 14px;
+    }
+
+    .btn-block { width: 100%; }
+
+    .table,
+    .table-clean,
+    .dash-table { font-size: 12px; }
+
+    .table thead th,
+    .table tbody td,
+    .table-clean thead th,
+    .table-clean tbody td,
+    .dash-table thead th,
+    .dash-table tbody td {
+        padding: 9px 8px;
+        white-space: nowrap;
+    }
+
+    .form-control,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+        height: 44px;
+        font-size: 13.5px;
+        padding: 8px 12px;
+    }
+
+    label { font-size: 12.5px; }
+
+    .card-body { padding: 16px; }
+
+    .card-header {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    .alert {
+        padding: 12px 14px;
+        font-size: 12.5px;
+    }
+
+    .modal-dialog {
+        margin: 20px 10px;
+        max-width: 100%;
+    }
+
+    .modal-body { padding: 16px; }
+
     .pagination {
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-    }
-    .pagination li {
-        margin-bottom: 4px !important;
-    }
-    .pagination li a {
-        padding: 5px 9px !important;
-        font-size: 12px !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
     }
 
-    /* فوتر */
-    footer {
-        padding: 16px 0 !important;
-        font-size: 12px !important;
+    .pagination li a,
+    .pagination li span {
+        min-width: 34px;
+        height: 34px;
+        padding: 0 10px;
+        font-size: 12px;
+    }
+
+    .footer-top { padding: 30px 0 20px; }
+
+    .footer-bottom .row > div {
         text-align: center !important;
-    }
-    .footer-widget .col-sm-3 {
-        width: 100% !important;
-        float: none !important;
+        margin-bottom: 8px;
     }
 
-    /* لوگو */
-    .logo span {
-        font-size: 18px !important;
+    .recommended_items {
+        margin-top: 32px;
+        padding-top: 24px;
     }
+
+    .recommended_items h2.title {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    .movakelinfo img,
+    .movakel-avatar-fallback {
+        width: 72px;
+        height: 72px;
+        font-size: 26px;
+    }
+
+    .movakelinfo h2 { font-size: 15px; }
+    .movakelinfo p { font-size: 12px; }
+
+    .page-breadcrumb {
+        padding: 10px 0;
+        margin-bottom: 16px;
+    }
+
+    .page-breadcrumb .container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .breadcrumb {
+        font-size: 12px;
+        justify-content: center;
+    }
+
+    .breadcrumb li a {
+        padding: 3px 6px;
+        font-size: 11.5px;
+    }
+
+    .breadcrumb li a span { display: none; }
+
+    .btn-back {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 16px;
+    }
+
+    .auth-section { padding: 30px 0 50px; }
+
+    .auth-card {
+        padding: 28px 20px 24px;
+        border-radius: 10px;
+    }
+
+    .error-card,
+    .access-denied-card {
+        padding: 32px 20px;
+        margin: 20px 0;
+    }
+
+    .case-header-top {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 18px 16px;
+        gap: 16px;
+    }
+
+    .case-avatar,
+    .case-avatar-fallback {
+        width: 64px;
+        height: 64px;
+        font-size: 22px;
+    }
+
+    .case-header-info h1 { font-size: 18px; }
+
+    .case-header-actions { justify-content: stretch; }
+
+    .case-header-actions .btn {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 11.5px;
+        height: 34px;
+    }
+
+    .case-status-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .case-status-form { flex-wrap: wrap; }
+
+    .case-status-form .status-select {
+        flex: 1;
+        min-width: 0;
+        height: 38px;
+        font-size: 12.5px;
+    }
+
+    .case-status-form .status-submit-btn {
+        height: 38px;
+        font-size: 12px;
+        padding: 0 16px;
+    }
+
+    .shop-details-tab .nav-tabs,
+    .calendar-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 0 8px;
+    }
+
+    .shop-details-tab .nav-tabs::-webkit-scrollbar,
+    .calendar-tabs::-webkit-scrollbar { display: none; }
+
+    .shop-details-tab .nav-tabs > li,
+    .calendar-tabs li { flex-shrink: 0; }
+
+    .shop-details-tab .nav-tabs > li > a {
+        padding: 12px 14px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .calendar-tabs li a {
+        padding: 12px 16px;
+        font-size: 12.5px;
+    }
+
+    .calendar-tabs li a span:not(.tab-badge) { display: none; }
+
+    .calendar-tabs li a i { font-size: 18px; }
+
+    .shop-details-tab .tab-content { padding: 16px; }
+
+    .shop-details-tab .tab-pane h3 {
+        font-size: 14.5px;
+        margin: 20px 0 12px;
+    }
+
+    .final-result-cell {
+        min-width: 130px;
+        max-width: 180px;
+        font-size: 12px;
+        line-height: 1.8;
+        padding: 10px 12px !important;
+    }
+
+    .payment-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .payment-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .payment-title { font-size: 16px; }
+
+    .payment-header-actions { justify-content: stretch; }
+
+    .payment-header-actions .btn {
+        flex: 1;
+        justify-content: center;
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .payment-details-section .section-block { padding: 14px; }
+
+    .payment-details-section .section-header h3 { font-size: 14.5px; }
+
+    .search-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .search-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .search-title { font-size: 16px; }
+
+    .search-form-card { padding: 16px; }
+
+    .search-form .form-control {
+        height: 44px;
+        font-size: 13.5px;
+    }
+
+    .search-main-input .form-control {
+        height: 50px;
+        font-size: 14px;
+    }
+
+    .search-form-actions { flex-direction: column; }
+
+    .search-form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .results-bar {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .results-count { justify-content: center; }
+
+    .search-placeholder,
+    .advanced-search-section .empty-state-full {
+        padding: 40px 20px;
+    }
+
+    .placeholder-icon,
+    .advanced-search-section .empty-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .placeholder-icon i,
+    .advanced-search-section .empty-icon i { font-size: 36px; }
+
+    .mform-header {
+        padding: 18px 16px;
+        gap: 12px;
+    }
+
+    .mform-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+        border-radius: 12px;
+    }
+
+    .mform-header-text h1 { font-size: 17px; }
+
+    .mform { padding: 16px; }
+
+    .mform-section-block {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .mform-section-header i {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .mform-section-header h3 { font-size: 14.5px; }
+
+    .mform-field input,
+    .mform-field select {
+        height: 44px;
+        font-size: 13.5px;
+    }
+
+    .mform-subject {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+
+    .mform-actions { flex-direction: column; }
+
+    .mform-btn {
+        width: 100%;
+        height: 48px;
+        padding: 12px 20px;
+    }
+
+    .mform-alert {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+
+    .mform-signatures {
+        flex-direction: column;
+        gap: 24px;
+        padding: 16px;
+        margin-top: 24px;
+    }
+
+    .mform-signature-box { max-width: 100%; }
+
+    .mform-signature-title { margin-bottom: 30px; }
+
+    .mform-print-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px 16px;
+        gap: 10px;
+    }
+
+    .mform-print-item {
+        justify-content: space-between;
+        min-width: auto;
+    }
+
+    .mform-print-title {
+        order: -1;
+        margin-bottom: 4px;
+    }
+
+    .calendar-header { padding: 16px; }
+
+    .calendar-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .calendar-title { font-size: 16px; }
+
+    .alert-today {
+        padding: 12px 14px;
+        gap: 12px;
+    }
+
+    .alert-today-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .alert-today-text { font-size: 13px; }
+
+    .calendar-tab-content { padding: 16px; }
+
+    .backup-header { padding: 16px; }
+
+    .backup-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .backup-title { font-size: 16px; }
+
+    .backup-create-body { padding: 16px; }
+
+    .btn-backup-create {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 13.5px;
+    }
+
+    .backup-list-header { padding: 14px 16px; }
+
+    .action-buttons { flex-direction: column; }
+
+    .btn-action {
+        padding: 6px 12px;
+        font-size: 11.5px;
+        justify-content: center;
+    }
+
+    .backup-info-box {
+        padding: 16px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .info-icon { margin: 0 auto; }
+
+    .user-panel-form { padding: 16px; }
+
+    .user-panel-header {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .user-panel-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .user-panel-header h1 { font-size: 16px; }
+
+    .user-panel-form .form-actions { flex-direction: column; }
+
+    .user-panel-form .form-actions .btn { width: 100%; }
+
+    .dash-page-title {
+        font-size: 16px;
+        margin-bottom: 16px;
+    }
+
+    .dash-page-title span {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .dashboard-card-header {
+        padding: 12px 16px;
+        font-size: 13.5px;
+    }
+
+    .meetings-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .meetings-header .btn-success { justify-content: center; }
+
+    .empty-state,
+    .empty-state-full { padding: 40px 20px; }
+
+    .empty-state i,
+    .empty-icon i { font-size: 40px; }
+
+    .signup-form {
+        margin: 14px 8px;
+        padding: 20px 14px;
+        border-radius: 10px;
+    }
+
+    .signup-form h2 { font-size: 18px; }
 }
 
-/* ══════════════════════════════════
-   Small Mobile  ≤ 480px
-══════════════════════════════════ */
+/* ===== Small Mobile - max-width 480px ===== */
+
 @media (max-width: 480px) {
+    body { font-size: 13.5px; }
 
     .container {
-        padding-right: 6px !important;
-        padding-left: 6px !important;
+        padding-right: 8px;
+        padding-left: 8px;
     }
 
-    /* منوی کاربر */
-    .header-middle .shop-menu .nav li a {
-        font-size: 11px !important;
-        padding: 4px 8px !important;
+    h1, .h1 { font-size: 19px; }
+    h2, .h2 { font-size: 16px; }
+    h3, .h3 { font-size: 14.5px; }
+
+    .title { font-size: 15px; }
+    .page-title { font-size: 16px; }
+
+    .stat-icon,
+    .dash-stat-icon,
+    .stat-card-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
     }
 
-    /* کارت‌ها */
-    .movakelinfo img {
-        width: 64px !important;
-        height: 64px !important;
-    }
-    .movakelinfo h2 {
-        font-size: 13px !important;
+    .stat-value,
+    .dash-stat-value,
+    .stat-card-value { font-size: 18px; }
+
+    .stat-card-label,
+    .dash-stat-label,
+    .stat-label { font-size: 11px; }
+
+    .finance-amount { font-size: 22px; }
+
+    .btn {
+        padding: 7px 12px;
+        font-size: 11.5px;
     }
 
-    /* فرم */
-    .form-control {
-        font-size: 13px !important;
+    .btn i { font-size: 11px; }
+
+    .btn-lg {
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+
+    .table,
+    .table-clean,
+    .dash-table { font-size: 11px; }
+
+    .table thead th,
+    .table tbody td,
+    .table-clean thead th,
+    .table-clean tbody td,
+    .dash-table thead th,
+    .dash-table tbody td { padding: 7px 6px; }
+
+    .form-control,
+    input,
+    select,
+    textarea {
+        height: 40px;
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    label { font-size: 12px; }
+
+    .card-body { padding: 12px; }
+
+    .card-header {
+        padding: 12px 14px;
+        font-size: 13.5px;
+    }
+
+    .movakelinfo img,
+    .movakel-avatar-fallback {
+        width: 64px;
+        height: 64px;
+        font-size: 22px;
+    }
+
+    .movakelinfo h2 { font-size: 14px; }
+    .movakelinfo p { font-size: 11.5px; }
+
+    .recommended_items h2.title { font-size: 16px; }
+
+    .final-result-cell {
+        min-width: 110px;
+        max-width: 150px;
+        font-size: 11px;
+        line-height: 1.7;
         padding: 8px 10px !important;
     }
-    label {
-        font-size: 12px !important;
+
+    .modal-dialog { margin: 10px 5px; }
+    .modal-body { padding: 12px; }
+
+    .breadcrumb { font-size: 11px; }
+    .breadcrumb li.active { font-size: 11.5px; }
+
+    .auth-section { padding: 20px 0 40px; }
+
+    .auth-card {
+        padding: 24px 16px 20px;
+        margin: 0 -5px 16px;
     }
 
-    /* عنوان */
-    h2.title {
-        font-size: 15px !important;
+    .auth-header {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
     }
 
-    /* جدول */
-    table {
-        font-size: 11px !important;
-    }
-    table th,
-    table td {
-        padding: 6px 8px !important;
+    .auth-header > i {
+        width: 56px;
+        height: 56px;
+        line-height: 56px;
+        font-size: 30px;
     }
 
-    /* دکمه‌ها */
-    .btn {
-        font-size: 11px !important;
-        padding: 5px 10px !important;
+    .auth-header h2 { font-size: 17px; }
+
+    .auth-form .form-group { margin-bottom: 16px; }
+
+    .auth-form label { font-size: 13px; }
+
+    .auth-form .form-control {
+        height: 42px;
+        font-size: 14px;
+        padding: 8px 12px;
     }
 
-    /* لوگو */
-    .header-middle .logo img {
-        max-height: 40px !important;
+    .auth-form .btn-block {
+        height: 44px;
+        font-size: 14px;
     }
-    .header-bottom .mainmenu ul li a {
-        font-size: 13px !important;
-        padding: 10px 16px !important;
+
+    .calendar-title { font-size: 15px; }
+    .backup-title { font-size: 15px; }
+
+    .file-name {
+        font-size: 10.5px;
+        padding: 3px 6px;
+    }
+
+    .dash-stat-value { font-size: 20px; }
+
+    .btn-view {
+        padding: 4px 10px;
+        font-size: 10.5px;
+    }
+
+    .mform-header-text h1 { font-size: 15px; }
+
+    .mform-print-input {
+        width: 80px;
+        height: 30px;
+        font-size: 12.5px;
     }
 }
+
+/* ===== Print ===== */
+
+@media print {
+    .no-print,
+    .btn,
+    .navbar-toggle,
+    .page-breadcrumb,
+    .site-header,
+    .site-footer { display: none !important; }
+
+    body {
+        background: white;
+        color: black;
+        font-size: 11pt;
+    }
+
+    a[href]::after { content: ""; }
+
+    .table-responsive { overflow: visible !important; }
+    .table thead { display: table-header-group; }
+    .table tr { page-break-inside: avoid; }
+}
+
+/* End of responsive.css */

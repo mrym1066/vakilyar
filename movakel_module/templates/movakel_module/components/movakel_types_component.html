@@ -1,11 +1,24 @@
-<div class="types_movakels">
-    <h2>نوع پرونده ها</h2>
-    <div class="types-name">
-        <ul class="nav nav-pills nav-stacked">
-            {% for type in types %}
-                <li><a href="{% url 'movakel-categories-list' cat=type.url_title %}"> <span
-                        class="pull-left">({{ type.movakels_count }})</span>{{ type.title }}</a></li>
+<div class="ml-sidebar-widget">
+    <h3 class="ml-widget-title">
+        <i class="fa fa-list-ul"></i>
+        نوع پرونده‌ها
+    </h3>
+
+    {% if type_list %}
+        <ul class="ml-widget-list">
+            {% for type in type_list %}
+                <li class="ml-widget-item">
+                    <a href="?type={{ type.url_title }}">
+                        <span class="ml-widget-name">{{ type.title }}</span>
+                        <span class="ml-widget-count">{{ type.count }}</span>
+                    </a>
+                </li>
             {% endfor %}
         </ul>
-    </div>
+    {% else %}
+        <div class="ml-widget-empty">
+            <i class="fa fa-info-circle"></i>
+            نوع پرونده‌ای ثبت نشده
+        </div>
+    {% endif %}
 </div>

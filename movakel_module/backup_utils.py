@@ -46,8 +46,14 @@ def get_all_backups():
 
 def delete_backup(filename):
     backup_dir = get_backup_dir()
-    file_path = os.path.join(backup_dir, filename)
-    if os.path.exists(file_path) and filename.endswith('.sqlite3'):
+    # فقط نام خالص فایل مجاز است؛ هر بخشی از مسیر (../ و غیره) حذف می‌شود
+    safe_filename = os.path.basename(filename or '')
+    file_path = os.path.join(backup_dir, safe_filename)
+    if (
+        safe_filename.endswith('.sqlite3')
+        and os.path.exists(file_path)
+        and os.path.commonpath([os.path.abspath(file_path), os.path.abspath(backup_dir)]) == os.path.abspath(backup_dir)
+    ):
         os.remove(file_path)
         return True
     return False

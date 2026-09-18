@@ -25,25 +25,27 @@ urlpatterns = [
     path('', views.MovakelListView.as_view(), name='movakel-list'),
     path('cat/<cat>', views.MovakelListView.as_view(), name='movakel-categories-list'),
 
+    # ===== گزارش مالی (مهم: قبل از slug) =====
+    path('total-costs/', views.total_costs_view, name='total_costs'),
+
     # جلسات
     path('request-meeting/', request_meeting_view, name='request_meeting'),
     path('meetings/', meeting_list_view, name='meeting_list'),
     path('generate-pdf/<int:meeting_id>/', views.generate_pdf, name='meeting_pdf'),
 
-    # ویرایش رکوردهای موجود در صفحه جزئیات موکل
-    path('edit/<uslug:slug>/', views.edit_movakel_basic, name='edit_movakel_basic'),
+    # ویرایش رکوردهای موجود
+    path('edit/<uslug:slug>/', views.edit_movakel, name='edit_movakel'),
     path('edit/<uslug:slug>/court/', views.edit_court_info, name='edit_court_info'),
     path('edit/<uslug:slug>/notes/', views.edit_movakel_notes, name='edit_movakel_notes'),
     path('edit/meeting/<int:pk>/', views.edit_request_meeting, name='edit_request_meeting'),
     path('edit/visit/<int:pk>/', views.edit_visit, name='edit_visit'),
-    path('edit/service/<int:pk>/', views.edit_service_type, name='edit_service_type'),
+    path('edit/service/<int:pk>/', views.service_type_detail, name='service_type_detail'),
     path('edit/defense-document/<int:pk>/', views.edit_defense_document, name='edit_defense_document'),
     path('edit/pdf/<int:pk>/', views.edit_pdf_file, name='edit_pdf_file'),
 
     # پرداخت
     path('movakel/<int:movakel_id>/payment_details/', views.show_payment_details, name='payment_details'),
 
-  
     # ابزارها
     path('calculate-damage/', views.calculate_damage_view, name='calculate_damage'),
     path('hearing-calendar/', views.hearing_calendar_view, name='hearing_calendar'),
@@ -66,7 +68,13 @@ urlpatterns = [
     path('admin/get_service_price/<int:service_type_id>/', get_service_price, name='get_service_price'),
     path('access-denied/', lambda request: render(request, 'errors/access_denied.html'), name='access_denied'),
 
-  # جزئیات موکل (class-based — اصلی)
+    # ═══ PDF Generation ═══
+    path('pdf/contract/<int:movakel_id>/', views.pdf_contract, name='pdf_contract'),
+    path('pdf/report/<int:movakel_id>/', views.pdf_report, name='pdf_report'),
+    path('pdf/total-report/', views.pdf_total_report, name='pdf_total_report'),
+    path('pdf/meeting/<int:meeting_id>/', views.pdf_meeting_form, name='pdf_meeting_form'),
+  
+  
+    # ===== این باید همیشه آخرین خط باشه =====
     path('<uslug:slug>/', views.MovakelDetailView.as_view(), name='movakel-detail'),
-
 ]

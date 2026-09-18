@@ -1,0 +1,40 @@
+{% if breadcrumbs %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <!-- خانه (همیشه هست) -->
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+
+            <!-- آیتم‌های دیگر -->
+            {% for crumb in breadcrumbs %}
+                {% if crumb.url %}
+                    <li>
+                        <a href="{{ crumb.url }}">
+                            {% if crumb.icon %}<i class="fa {{ crumb.icon }}"></i>{% endif %}
+                            <span>{{ crumb.title }}</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="active" aria-current="page">
+                        {% if crumb.icon %}<i class="fa {{ crumb.icon }}"></i>{% endif %}
+                        <span>{{ crumb.title }}</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+
+        <!-- دکمه بازگشت -->
+        <button type="button"
+                class="btn-back"
+                onclick="{% if back_url %}location.href='{{ back_url }}'{% else %}history.back(){% endif %}">
+            <i class="fa fa-arrow-right"></i>
+            <span>{% if back_text %}{{ back_text }}{% else %}بازگشت{% endif %}</span>
+        </button>
+    </div>
+</nav>
+{% endif %}

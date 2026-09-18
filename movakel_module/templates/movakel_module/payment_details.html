@@ -1,170 +1,373 @@
 {% extends 'shared/_layout.html' %}
 {% load render_partial %}
-{% load poll_extras %}
-{% load jalali_tags %}
-{% load jalali_filters %}
+{% load common_tags %}
 {% load humanize %}
-{% load three_digits_currency %}
 
-{% block title %}
-    جزئیات پرداخت‌ها برای {{ movakel.name }}
+{% block title %}جزئیات پرداخت‌ها - {{ movakel.name }}{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-folder-open"></i>
+                    <span>پرونده‌ها</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'movakel-detail' movakel.slug %}">
+                    <i class="fa fa-user"></i>
+                    <span>{{ movakel.name|truncatechars:20 }}</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-money"></i>
+                <span>جزئیات پرداخت‌ها</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i>
+            <span>بازگشت</span>
+        </button>
+    </div>
+</nav>
 {% endblock %}
 
 {% block content %}
-<section>
+<section class="payment-details-section">
     <div class="container">
 
-        <h2 class="title text-center">جزئیات پرداخت‌ها برای موکل {{ movakel.name }}</h2>
+        <!-- ═══ هدر صفحه ═══ -->
+        <div class="payment-header">
+            <div class="payment-header-info">
+                <div class="payment-header-icon">
+                    <i class="fa fa-money"></i>
+                </div>
+                <div>
+                    <h1 class="payment-title">جزئیات پرداخت‌های پرونده</h1>
+                    <p class="payment-subtitle">
+                        <i class="fa fa-user"></i>
+                        موکل: <strong>{{ movakel.name }}</strong>
+                        {% if movakel.mobile_number %}
+                            <span class="divider">|</span>
+                            <i class="fa fa-phone"></i>
+                            <span dir="ltr">{{ movakel.mobile_number }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
 
-        <!-- خلاصه پرداخت‌ها -->
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fa fa-file-text-o"></i></div>
-                    <div>
-                        <div class="stat-value">{{ movakel.total_amount|persian_intcomma }}</div>
-                        <div class="stat-label">مبلغ کل حق‌الوکاله (تومان)</div>
-                    </div>
+            <div class="payment-header-actions no-print">
+                <a href="{% url 'movakel-detail' movakel.slug %}" class="btn btn-outline-navy">
+                    <i class="fa fa-arrow-right"></i>
+                    <span>بازگشت به پرونده</span>
+                </a>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="fa fa-print"></i>
+                    <span>چاپ</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══ خلاصه مالی (کارت‌های آماری) ═══ -->
+        <div class="financial-stats-grid">
+            <div class="financial-stat-card stat-primary">
+                <div class="stat-card-icon">
+                    <i class="fa fa-file-text-o"></i>
+                </div>
+                <div class="stat-card-body">
+                    <div class="stat-card-value">{{ movakel.total_amount|intcomma }}</div>
+                    <div class="stat-card-label">مبلغ کل حق‌الوکاله</div>
+                    <div class="stat-card-unit">تومان</div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:#d4f0e2; color:var(--success);"><i class="fa fa-check-circle"></i></div>
-                    <div>
-                        <div class="stat-value" style="color:var(--success);">{{ total_paid|persian_intcomma }}</div>
-                        <div class="stat-label">جمع کل پرداخت‌ها (تومان)</div>
-                    </div>
+
+            <div class="financial-stat-card stat-success">
+                <div class="stat-card-icon">
+                    <i class="fa fa-check-circle"></i>
+                </div>
+                <div class="stat-card-body">
+                    <div class="stat-card-value">{{ total_paid|default:0|intcomma }}</div>
+                    <div class="stat-card-label">جمع کل پرداخت‌ها</div>
+                    <div class="stat-card-unit">تومان</div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:#fde8e8; color:var(--danger);"><i class="fa fa-exclamation-circle"></i></div>
-                    <div>
-                        <div class="stat-value" style="color:var(--danger);">{{ remaining_amount|persian_intcomma }}</div>
-                        <div class="stat-label">باقی‌مانده بدهی (تومان)</div>
-                    </div>
+
+            <div class="financial-stat-card stat-danger">
+                <div class="stat-card-icon">
+                    <i class="fa fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-card-body">
+                    <div class="stat-card-value">{{ remaining_amount|default:0|intcomma }}</div>
+                    <div class="stat-card-label">باقی‌مانده بدهی</div>
+                    <div class="stat-card-unit">تومان</div>
+                </div>
+            </div>
+
+            <div class="financial-stat-card stat-warning">
+                <div class="stat-card-icon">
+                    <i class="fa fa-percent"></i>
+                </div>
+                <div class="stat-card-body">
+                    <div class="stat-card-value">{{ total_tax|default:0|intcomma }}</div>
+                    <div class="stat-card-label">جمع کل مالیات‌ها</div>
+                    <div class="stat-card-unit">تومان</div>
                 </div>
             </div>
         </div>
 
-        <!-- جدول اقساط -->
-        <div class="movakel-details" style="padding:0; overflow:hidden; margin-top:8px;">
-            <h3 style="margin:0; padding:16px 20px 0;">جدول پرداخت‌های حق‌الوکاله</h3>
-            <div class="table-responsive" style="padding:16px 20px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>مبلغ</th>
-                            <th>تاریخ سررسید</th>
-                            <th>تاریخ پرداخت</th>
-                            <th>وضعیت</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in movakel.installment_payments.all %}
-                        <tr>
-                            <td>{{ payment.amount|persian_intcomma }} تومان</td>
-                            <td>{{ payment.due_date|jalali_date }}</td>
-                            <td>{{ payment.payment_date|jalali_date }}</td>
-                            <td>
-                                {% if payment.is_paid %}
-                                    <span class="badge badge-success">✅ پرداخت شده</span>
-                                {% else %}
-                                    <span class="badge badge-danger">❌ پرداخت نشده</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4"><div class="empty-state" style="padding:20px;"><p>قسطی ثبت نشده است.</p></div></td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- ═══ جدول اقساط حق‌الوکاله ═══ -->
+        <div class="section-block">
+            <div class="section-header">
+                <h3>
+                    <i class="fa fa-calendar-check-o"></i>
+                    جدول پرداخت‌های حق‌الوکاله (اقساط)
+                </h3>
+                <span class="section-count">
+                    {{ movakel.installment_payments.count }} قسط
+                </span>
             </div>
+
+            {% if movakel.installment_payments.all %}
+                <div class="table-responsive">
+                    <table class="table table-clean table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>مبلغ قسط</th>
+                                <th>تاریخ سررسید</th>
+                                <th>تاریخ پرداخت</th>
+                                <th>وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in movakel.installment_payments.all %}
+                                <tr>
+                                    <td class="row-num">{{ forloop.counter }}</td>
+                                    <td class="money-cell">{{ payment.amount|intcomma }} تومان</td>
+                                    <td>{{ payment.due_date|jalali_date }}</td>
+                                    <td>
+                                        {% if payment.payment_date %}
+                                            {{ payment.payment_date|jalali_date }}
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if payment.is_paid %}
+                                            <span class="badge-status badge-closed">
+                                                <i class="fa fa-check-circle"></i> پرداخت شده
+                                            </span>
+                                        {% else %}
+                                            <span class="badge-status badge-execution">
+                                                <i class="fa fa-clock-o"></i> پرداخت نشده
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state-sm">
+                    <i class="fa fa-calendar-o"></i>
+                    <p>هیچ قسطی برای این پرونده ثبت نشده است.</p>
+                </div>
+            {% endif %}
         </div>
 
-        <!-- جدول مالیات‌ها -->
-        <div class="movakel-details" style="padding:0; overflow:hidden; margin-top:20px;">
-            <h3 style="margin:0; padding:16px 20px 0;">مالیات‌ها</h3>
-            <div class="table-responsive" style="padding:16px 20px;">
-                <table>
+        <!-- ═══ جدول مالیات‌ها ═══ -->
+        <div class="section-block">
+            <div class="section-header">
+                <h3>
+                    <i class="fa fa-percent"></i>
+                    مالیات‌ها و عوارض قانونی
+                </h3>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-clean tax-table">
                     <thead>
                         <tr>
                             <th>عنوان</th>
-                            <th>مقدار</th>
+                            <th>درصد</th>
+                            <th>مبلغ</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>تمبر مالیاتی (۵٪)</td>
-                            <td>{{ stamp_tax|persian_intcomma }} تومان</td>
+                            <td>
+                                <i class="fa fa-certificate tax-icon tax-icon-primary"></i>
+                                تمبر مالیاتی
+                            </td>
+                            <td><span class="tax-percent">۵٪</span></td>
+                            <td class="money-cell">{{ stamp_tax|intcomma }} تومان</td>
                         </tr>
                         <tr>
-                            <td>سهم مرکز وکلای قوه قضائیه (۵٪)</td>
-                            <td>{{ judiciary_share|persian_intcomma }} تومان</td>
+                            <td>
+                                <i class="fa fa-balance-scale tax-icon tax-icon-info"></i>
+                                سهم مرکز وکلای قوه قضائیه
+                            </td>
+                            <td><span class="tax-percent">۵٪</span></td>
+                            <td class="money-cell">{{ judiciary_share|intcomma }} تومان</td>
                         </tr>
                         <tr>
-                            <td>مالیات پایان سال (۲۵٪)</td>
-                            <td>{{ annual_tax|persian_intcomma }} تومان</td>
-                        </tr>
-                        <tr style="background:var(--gray-100); font-weight:700;">
-                            <td>جمع کل مالیات‌ها</td>
-                            <td>{{ total_tax|persian_intcomma }} تومان</td>
+                            <td>
+                                <i class="fa fa-calendar tax-icon tax-icon-warning"></i>
+                                مالیات پایان سال
+                            </td>
+                            <td><span class="tax-percent">۲۵٪</span></td>
+                            <td class="money-cell">{{ annual_tax|intcomma }} تومان</td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                        <tr class="grand-total-row">
+                            <td colspan="2">
+                                <strong>
+                                    <i class="fa fa-calculator"></i>
+                                    جمع کل مالیات‌ها
+                                </strong>
+                            </td>
+                            <td class="money-cell grand">{{ total_tax|intcomma }} تومان</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
 
-        <!-- جدول انواع خدمت -->
-        <div class="movakel-details" style="padding:0; overflow:hidden; margin-top:20px;">
-            <h3 style="margin:0; padding:16px 20px 0;">انواع خدمت</h3>
-            <div class="table-responsive" style="padding:16px 20px;">
-                <table>
+        <!-- ═══ جدول انواع خدمت ═══ -->
+<!-- ═══ جدول انواع خدمت ═══ -->
+        <div class="section-block">
+            <div class="section-header">
+                <h3>
+                    <i class="fa fa-briefcase"></i>
+                    انواع خدمت و هزینه‌ها
+                </h3>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-clean service-costs-table">
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>نوع هزینه</th>
                             <th>مقدار</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for key, value in selected_service_type.items %}
-                            <tr>
-                                <td>
-                                    {% if key == 'travel_fee' %}
-                                        هزینه سفر
-                                    {% elif key == 'miscellaneous_fee' %}
-                                        هزینه‌های متفرقه (اوراق، سی‌دی و غیره)
-                                    {% elif key == 'contract_fee' %}
-                                        هزینه تنظیم قراردادهای متفرقه
-                                    {% elif key == 'defense_fee' %}
-                                        هزینه دفاع
-                                    {% elif key == 'bill_fee' %}
-                                        هزینه ارسال لایحه
-                                    {% elif key == 'initial_fee' %}
-                                        هزینه دادرسی بدوی
-                                    {% elif key == 'appeal_fee' %}
-                                        هزینه اعتراض
-                                    {% elif key == 'enforcement_fee' %}
-                                        هزینه اجرای احکام
-                                    {% elif key == 'petition_fee' %}
-                                        هزینه تنظیم شکواییه
-                                    {% elif key == 'court_service_fee' %}
-                                        هزینه دفتر خدمات قضائی
-                                    {% elif key == 'notification_fee' %}
-                                        هزینه اخذ ابلاغیه از سامانه
-                                    {% elif key == 'document_fee' %}
-                                        هزینه اظهارنامه
-                                    {% endif %}
-                                </td>
-                                <td>{{ value|default:0|persian_intcomma }} تومان</td>
-                            </tr>
-                        {% endfor %}
-                        <tr style="background:var(--navy); color:var(--white); font-weight:700;">
-                            <td>جمع کل هزینه‌ها</td>
-                            <td>{{ total_service_fee|default:"0"|persian_intcomma }} تومان</td>
+                        <tr>
+                            <td class="row-num">1</td>
+                            <td>
+                                <i class="fa fa-car service-icon"></i> هزینه سفر
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.travel_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">2</td>
+                            <td>
+                                <i class="fa fa-ellipsis-h service-icon"></i> هزینه‌های متفرقه (اوراق، سی‌دی و غیره)
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.miscellaneous_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">3</td>
+                            <td>
+                                <i class="fa fa-file-text-o service-icon"></i> هزینه تنظیم قراردادهای متفرقه
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.contract_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">4</td>
+                            <td>
+                                <i class="fa fa-file-text-o service-icon"></i> هزینه ارسال لایحه
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.bill_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">5</td>
+                            <td>
+                                <i class="fa fa-legal service-icon"></i> هزینه دادرسی بدوی (تمبر دادرسی)
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.initial_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">6</td>
+                            <td>
+                                <i class="fa fa-balance-scale service-icon"></i> هزینه اعتراض (هزینه دادرسی)
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.appeal_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">7</td>
+                            <td>
+                                <i class="fa fa-gavel service-icon"></i> هزینه اجرای احکام
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.enforcement_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">8</td>
+                            <td>
+                                <i class="fa fa-file service-icon"></i> هزینه تنظیم شکوائیه
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.petition_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">9</td>
+                            <td>
+                                <i class="fa fa-building service-icon"></i> هزینه دفتر خدمات قضائی
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.court_service_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">10</td>
+                            <td>
+                                <i class="fa fa-envelope service-icon"></i> هزینه اخذ ابلاغیه از سامانه
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.notification_fee|default:0|intcomma }} تومان</td>
+                        </tr>
+                        <tr>
+                            <td class="row-num">11</td>
+                            <td>
+                                <i class="fa fa-file-o service-icon"></i> هزینه اظهارنامه
+                            </td>
+                            <td class="money-cell">{{ selected_service_type.document_fee|default:0|intcomma }} تومان</td>
                         </tr>
                     </tbody>
+                    {% if selected_service_type %}
+                        <tfoot>
+                            <tr class="grand-total-row">
+                                <td colspan="2">
+                                    <strong>
+                                        <i class="fa fa-calculator"></i>
+                                        جمع کل هزینه‌ها
+                                    </strong>
+                                </td>
+                                <td class="money-cell grand">
+                                    {{ total_service_fee|default:0|intcomma }} تومان
+                                </td>
+                            </tr>
+                        </tfoot>
+                    {% endif %}
                 </table>
+            </div>
+        </div>
+
+        <!-- ═══ راهنمای پایین صفحه ═══ -->
+        <div class="payment-footer-info no-print">
+            <div class="info-box">
+                <i class="fa fa-info-circle"></i>
+                <div>
+                    <strong>توجه:</strong>
+                    برای ویرایش مبالغ و اقساط، به پنل ادمین مراجعه کنید یا از دکمه «ویرایش اطلاعات» در صفحه پرونده استفاده کنید.
+                </div>
             </div>
         </div>
 

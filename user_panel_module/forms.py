@@ -1,6 +1,7 @@
 from django import forms
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.contrib.auth import password_validation
 
 from account_module.models import User
 
@@ -40,6 +41,10 @@ class EditProfileModelForm(forms.ModelForm):
 
 
 class ChangePasswordForm(forms.Form):
+    def __init__(self, *args, user=None, **kwargs):
+        self._user = user
+        super().__init__(*args, **kwargs)
+
     current_password = forms.CharField(
         label='کلمه عبور فعلی',
         widget=forms.PasswordInput(
@@ -82,3 +87,12 @@ class ChangePasswordForm(forms.Form):
             return confirm_password
 
         raise ValidationError('کلمه عبور و تکرار کلمه عبور مغایرت دارند')
+
+    def clean_password(self):
+        # همان قوانین قدرت رمز عبور که در ثبت‌نام (RegisterForm) اعمال می‌شود،
+        # اینجا هم برای رمز عبور جدید اعمال می‌شود (با در نظر گرفتن کاربر فعلی
+        # برای چک شباهت رمز با نام کاربری/اطلاعات کاربر).
+        password = self.cleaned_data.get('password')
+        if password:
+            password_validation.validate_password(password, user=self._user)
+        return password

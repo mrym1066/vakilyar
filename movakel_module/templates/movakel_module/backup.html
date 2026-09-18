@@ -2,97 +2,186 @@
 
 {% block title %}پشتیبان‌گیری{% endblock %}
 
-{% block content %}
-<div class="container mt-4" dir="rtl">
-    <h4 class="mb-4">💾 مدیریت پشتیبان‌گیری</h4>
-
-    <!-- پیام‌ها -->
-    {% if message %}
-    <div class="alert alert-success">{{ message }}</div>
-    {% endif %}
-    {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-
-    <!-- ایجاد backup -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">📦 ایجاد پشتیبان جدید</div>
-        <div class="card-body">
-            <p class="text-muted mb-3">
-                با کلیک روی دکمه زیر، یک نسخه پشتیبان از کل دیتابیس ایجاد می‌شود
-                و در پوشه <code>backups</code> پروژه ذخیره می‌گردد.
-            </p>
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="create">
-                <button type="submit" class="btn btn-primary">
-                    💾 ایجاد پشتیبان الان
-                </button>
-            </form>
-        </div>
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+            <li class="active">
+                <i class="fa fa-database"></i>
+                <span>پشتیبان‌گیری</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i>
+            <span>بازگشت</span>
+        </button>
     </div>
+</nav>
+{% endblock %}
 
-    <!-- لیست backup ها -->
-    <div class="card">
-        <div class="card-header bg-dark text-white">
-            📂 فایل‌های پشتیبان موجود
-            <span class="badge bg-light text-dark ms-2">{{ backups|length }}</span>
+{% block content %}
+<section class="backup-section">
+    <div class="container">
+
+        <!-- ═══ هدر صفحه ═══ -->
+        <div class="backup-header">
+            <div class="backup-header-info">
+                <div class="backup-header-icon">
+                    <i class="fa fa-database"></i>
+                </div>
+                <div>
+                    <h1 class="backup-title">مدیریت پشتیبان‌گیری</h1>
+                    <p class="backup-subtitle">
+                        ایجاد، دانلود و مدیریت نسخه‌های پشتیبان از دیتابیس
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
+
+        <!-- ═══ پیام‌ها ═══ -->
+        {% if message %}
+            <div class="alert-custom alert-custom-success">
+                <i class="fa fa-check-circle"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert-custom alert-custom-danger">
+                <i class="fa fa-exclamation-circle"></i>
+                <span>{{ error }}</span>
+            </div>
+        {% endif %}
+
+        <!-- ═══ کارت ایجاد پشتیبان ═══ -->
+        <div class="backup-create-card">
+            <div class="backup-create-header">
+                <i class="fa fa-plus-circle"></i>
+                <h3>ایجاد پشتیبان جدید</h3>
+            </div>
+            <div class="backup-create-body">
+                <p class="backup-create-desc">
+                    با کلیک روی دکمه زیر، یک نسخه پشتیبان از کل دیتابیس ایجاد می‌شود
+                    و در پوشه <code>backups</code> پروژه ذخیره می‌گردد.
+                </p>
+                <form method="POST" class="backup-create-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create">
+                    <button type="submit" class="btn-backup-create">
+                        <i class="fa fa-save"></i>
+                        <span>ایجاد پشتیبان الان</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══ کارت لیست پشتیبان‌ها ═══ -->
+        <div class="backup-list-card">
+            <div class="backup-list-header">
+                <div class="backup-list-title">
+                    <i class="fa fa-folder-open"></i>
+                    <h3>فایل‌های پشتیبان موجود</h3>
+                </div>
+                <span class="backup-count-badge">
+                    {{ backups|length }} فایل
+                </span>
+            </div>
+
             {% if backups %}
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered">
-                    <thead class="table-secondary">
-                        <tr>
-                            <th>#</th>
-                            <th>نام فایل</th>
-                            <th>تاریخ ایجاد</th>
-                            <th>حجم</th>
-                            <th>عملیات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for backup in backups %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td><code>{{ backup.name }}</code></td>
-                            <td>{{ backup.created }}</td>
-                            <td>{{ backup.size_kb }} KB</td>
-                            <td class="d-flex gap-2">
-                                <!-- دانلود -->
-                                <a href="{% url 'download_backup' backup.name %}"
-                                   class="btn btn-sm btn-success">
-                                    ⬇️ دانلود
-                                </a>
-                                <!-- حذف -->
-                                <form method="POST"
-                                      onsubmit="return confirm('آیا از حذف این فایل اطمینان دارید؟')">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="filename" value="{{ backup.name }}">
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        🗑️ حذف
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                <div class="table-responsive">
+                    <table class="table-clean">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>نام فایل</th>
+                                <th>تاریخ ایجاد</th>
+                                <th>حجم</th>
+                                <th class="no-print">عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for backup in backups %}
+                                <tr>
+                                    <td class="row-num">{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="file-cell">
+                                            <div class="file-icon">
+                                                <i class="fa fa-file-archive-o"></i>
+                                            </div>
+                                            <span class="file-name">{{ backup.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="date-cell">
+                                            <i class="fa fa-calendar"></i>
+                                            {{ backup.created }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="size-badge">
+                                            <i class="fa fa-hdd-o"></i>
+                                            {{ backup.size_kb }} KB
+                                        </span>
+                                    </td>
+                                    <td class="no-print">
+                                        <div class="action-buttons">
+                                            <a href="{% url 'download_backup' backup.name %}"
+                                               class="btn-action btn-download"
+                                               title="دانلود فایل">
+                                                <i class="fa fa-download"></i>
+                                                دانلود
+                                            </a>
+                                            <form method="POST"
+                                                  class="delete-form"
+                                                  onsubmit="return confirm('آیا از حذف این فایل اطمینان دارید؟');">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="filename" value="{{ backup.name }}">
+                                                <button type="submit"
+                                                        class="btn-action btn-delete"
+                                                        title="حذف فایل">
+                                                    <i class="fa fa-trash-o"></i>
+                                                    حذف
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
-            <div class="text-center py-4 text-muted">
-                <p>هنوز هیچ فایل پشتیبانی ایجاد نشده.</p>
-            </div>
+                <div class="empty-state-sm">
+                    <i class="fa fa-folder-o"></i>
+                    <h3>هنوز پشتیبانی ایجاد نشده</h3>
+                    <p>با کلیک روی «ایجاد پشتیبان الان» اولین نسخه پشتیبان را بسازید.</p>
+                </div>
             {% endif %}
         </div>
-    </div>
 
-    <!-- راهنما -->
-    <div class="alert alert-info mt-4">
-        <strong>💡 توصیه:</strong>
-        هفته‌ای یک بار پشتیبان بگیرید و فایل را در یک درایو خارجی یا USB ذخیره کنید.
-    </div>
+        <!-- ═══ باکس راهنما ═══ -->
+        <div class="backup-info-box">
+            <div class="info-icon">
+                <i class="fa fa-lightbulb-o"></i>
+            </div>
+            <div class="info-content">
+                <strong>توصیه‌های مهم پشتیبان‌گیری:</strong>
+                <ul>
+                    <li>هفته‌ای یک بار از دیتابیس پشتیبان بگیرید.</li>
+                    <li>فایل پشتیبان را در یک درایو خارجی یا USB ذخیره کنید.</li>
+                    <li>قبل از هر به‌روزرسانی سیستم، پشتیبان جدید بگیرید.</li>
+                    <li>برای امنیت بیشتر، پشتیبان را در فضای ابری هم ذخیره کنید.</li>
+                </ul>
+            </div>
+        </div>
 
-</div>
+    </div>
+</section>
 {% endblock %}

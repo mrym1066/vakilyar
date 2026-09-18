@@ -1,95 +1,333 @@
 {% extends 'shared/_layout.html' %}
-{% block title %}لیست ملاقات‌ها{% endblock %}
+{% load static %}
 {% load humanize %}
 
-{% block content %}
-<section>
-    <div class="container">
+{% block title %}لیست ملاقات‌ها{% endblock %}
 
-        <div class="row" style="align-items:center; margin-bottom:8px;">
-            <div class="col-sm-6">
-                <h2 class="title">لیست ملاقات‌ها</h2>
+{% block header_references %}
+    <link rel="stylesheet" href="{% static 'css/page.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="meetings-list-page">
+    <div class="ml-container">
+
+        <!-- ===== Breadcrumb ===== -->
+        <nav aria-label="breadcrumb" class="page-breadcrumb no-print">
+            <div class="ml-breadcrumb-inner">
+                <ol class="breadcrumb">
+                    <li>
+                        <a href="{% url 'movakel-list' %}">
+                            <i class="fa fa-home"></i>
+                            <span>خانه</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'movakel-list' %}">
+                            <i class="fa fa-folder-open"></i>
+                            <span>پرونده‌ها</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <i class="fa fa-calendar"></i>
+                        <span>لیست ملاقات‌ها</span>
+                    </li>
+                </ol>
+                <button type="button" class="btn-back" onclick="history.back()">
+                    <i class="fa fa-arrow-right"></i>
+                    <span>بازگشت</span>
+                </button>
             </div>
-            <div class="col-sm-6 text-left no-print">
-                <a href="{% url 'request_meeting' %}" class="btn btn-success">
-                    <i class="fa fa-plus"></i> ثبت ملاقات جدید
+        </nav>
+
+        <!-- ===== هدر سرمه‌ای ===== -->
+        <div class="ml-header">
+            <div class="ml-header-info">
+                <div class="ml-header-icon">
+                    <i class="fa fa-calendar-check-o"></i>
+                </div>
+                <div class="ml-header-text">
+                    <h1>لیست ملاقات‌ها</h1>
+                    <p>
+                        <i class="fa fa-info-circle"></i>
+                        مدیریت درخواست‌های ملاقات و مشاوره
+                    </p>
+                </div>
+            </div>
+
+            <div class="ml-header-actions no-print">
+                <a href="{% url 'request_meeting' %}" class="ml-btn-new">
+                    <i class="fa fa-plus"></i>
+                    <span>ثبت ملاقات جدید</span>
                 </a>
             </div>
         </div>
 
-        <div class="movakel-details" style="padding:0; overflow:hidden;">
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ردیف</th>
-                            <th>نام</th>
-                            <th>شماره ملی</th>
-                            <th>نوع ملاقات</th>
-                            <th>موضوع ملاقات</th>
-                            <th>تاریخ</th>
-                            <th>مدت جلسه</th>
-                            <th>هزینه</th>
-                            <th>پرینت</th>
-                            <th>وضعیت</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for meeting in meetings %}
+        <!-- ===== پیام‌ها ===== -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-custom alert-custom-{{ message.tags }}">
+                    <i class="fa fa-info-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- ===== فیلتر جستجو ===== -->
+        <div class="ml-card no-print">
+            <div class="ml-card-header">
+                <div class="ml-card-header-icon ml-icon-gold">
+                    <i class="fa fa-search"></i>
+                </div>
+                <div class="ml-card-header-text">
+                    <h3>جستجو و فیلتر</h3>
+                    <p>برای یافتن سریع‌تر ملاقات‌ها استفاده کنید</p>
+                </div>
+            </div>
+
+            <div class="ml-card-body">
+                <form method="get" action="" class="ml-filter-form">
+                    <div class="ml-filter-row">
+                        <div class="col-md-4 col-sm-6">
+                            <div class="ml-field">
+                                <label>
+                                    <i class="fa fa-search"></i>
+                                    جستجو (نام، کد ملی، موبایل)
+                                </label>
+                                <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
+                                    placeholder="نام یا کد ملی..." class="ml-input">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6">
+                            <div class="ml-field">
+                                <label>
+                                    <i class="fa fa-tag"></i>
+                                    وضعیت
+                                </label>
+                                <select name="status" class="ml-input">
+                                    <option value="">همه</option>
+                                    <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>⏳ در انتظار</option>
+                                    <option value="converted" {% if request.GET.status == 'converted' %}selected{% endif %}>✅ تبدیل شده</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6">
+                            <div class="ml-field">
+                                <label>
+                                    <i class="fa fa-calendar"></i>
+                                    نوع ملاقات
+                                </label>
+                                <select name="type" class="ml-input">
+                                    <option value="">همه</option>
+                                    <option value="consultation" {% if request.GET.type == 'consultation' %}selected{% endif %}>مشاوره</option>
+                                    <option value="legal" {% if request.GET.type == 'legal' %}selected{% endif %}>حقوقی</option>
+                                    <option value="contract" {% if request.GET.type == 'contract' %}selected{% endif %}>قرارداد</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-sm-6">
+                            <div class="ml-field">
+                                <label>&nbsp;</label>
+                                <button type="submit" class="ml-btn-filter">
+                                    <i class="fa fa-search"></i>
+                                    <span>اعمال</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== جدول ملاقات‌ها ===== -->
+        <div class="ml-card">
+            <div class="ml-card-header">
+                <div class="ml-card-header-icon ml-icon-navy">
+                    <i class="fa fa-list"></i>
+                </div>
+                <div class="ml-card-header-text">
+                    <h3>لیست ملاقات‌ها</h3>
+                    <p>
+                        مجموع:
+                        <strong>{{ meetings|length }}</strong>
+                        ملاقات
+                    </p>
+                </div>
+            </div>
+
+            {% if meetings %}
+                <div class="ml-table-wrapper">
+                    <table class="ml-table">
+                        <thead>
                             <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td><strong>{{ meeting.full_name }}</strong></td>
-                                <td>{{ meeting.national_id }}</td>
-                                <td>{{ meeting.get_meeting_type_display }}</td>
-                                <td>
-                                    {% if meeting.meeting_subject.all.count > 0 %}
-                                        {% for subject in meeting.meeting_subject.all %}
-                                            <span class="badge badge-info">{{ subject.name }}</span>
-                                        {% endfor %}
-                                    {% else %}
-                                        <span class="text-muted">موضوعی انتخاب نشده است</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if meeting.meeting_date %}
-                                        {{ meeting.meeting_date|date:"Y/m/d H:i" }}
-                                    {% else %}
-                                        <span class="text-muted">زمان تعیین نشده</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if meeting.duration %}
-                                        {{ meeting.duration }}
-                                    {% else %}
-                                        <span class="text-muted">—</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ meeting.meeting_fee|default:"-"|intcomma }} تومان</td>
-                                <td class="no-print">
-                                    <a href="{% url 'meeting_pdf' meeting.id %}" target="_blank" class="btn btn-sm btn-primary">
-                                        <i class="fa fa-file-pdf-o"></i> PDF
-                                    </a>
-                                </td>
-                                <td>
-                                    {% if meeting.related_movakel %}
-                                        <span class="badge badge-success">✅ وکالت</span>
-                                    {% else %}
-                                        <span class="badge badge-warning">⏳ مشاوره</span>
-                                    {% endif %}
-                                </td>
+                                <th class="ml-th-num">#</th>
+                                <th>نام و نام خانوادگی</th>
+                                <th>کد ملی</th>
+                                <th>نوع</th>
+                                <th>موضوع</th>
+                                <th>تاریخ ملاقات</th>
+                                <th>مدت</th>
+                                <th>هزینه</th>
+                                <th>وضعیت</th>
+                                <th class="no-print ml-th-actions">عملیات</th>
                             </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="10">
-                                    <div class="empty-state">
-                                        <i class="fa fa-calendar-o"></i>
-                                        <p>هیچ ملاقاتی ثبت نشده است.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for meeting in meetings %}
+                                <tr>
+                                    <td class="ml-td-num">{{ forloop.counter }}</td>
+
+                                    <!-- نام -->
+                                    <td>
+                                        <div class="ml-name-cell">
+                                            <i class="fa fa-user-circle"></i>
+                                            <strong>{{ meeting.full_name }}</strong>
+                                        </div>
+                                    </td>
+
+                                    <!-- کد ملی -->
+                                    <td>
+                                        <span class="ml-code">{{ meeting.national_id|default:"—" }}</span>
+                                    </td>
+
+                                    <!-- نوع -->
+                                    <td>
+                                        {% if meeting.meeting_type %}
+                                            <span class="ml-badge ml-badge-type">
+                                                {{ meeting.get_meeting_type_display }}
+                                            </span>
+                                        {% else %}
+                                            <span class="ml-muted">—</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- موضوع -->
+                                    <td>
+                                        {% if meeting.meeting_subject.all %}
+                                            <div class="ml-subjects">
+                                                {% for subject in meeting.meeting_subject.all %}
+                                                    <span class="ml-badge ml-badge-subject">{{ subject.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="ml-muted">—</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- تاریخ ملاقات -->
+                                    <td>
+                                        {% if meeting.meeting_date %}
+                                            <div class="ml-date-cell">
+                                                <span>{{ meeting.meeting_date|date:"Y/m/d" }}</span>
+                                            </div>
+                                        {% else %}
+                                            <span class="ml-muted">تعیین نشده</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- مدت — ✅ اصلاح شد -->
+                                    <td>
+                                        {% if meeting.duration %}
+                                            <span class="ml-duration">
+                                                <i class="fa fa-clock-o"></i>
+                                                {{ meeting.duration }}
+                                            </span>
+                                        {% else %}
+                                            <span class="ml-muted">—</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- هزینه -->
+                                    <td>
+                                        {% if meeting.meeting_fee %}
+                                            <span class="ml-fee">
+                                                {{ meeting.meeting_fee|intcomma }}
+                                                <small>تومان</small>
+                                            </span>
+                                        {% else %}
+                                            <span class="ml-muted">—</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- وضعیت -->
+                                    <td>
+                                        {% if meeting.status == 'converted' or meeting.related_movakel %}
+                                            <span class="ml-badge ml-badge-success">
+                                                <i class="fa fa-check-circle"></i>
+                                                وکالت
+                                            </span>
+                                        {% else %}
+                                            <span class="ml-badge ml-badge-warning">
+                                                <i class="fa fa-clock-o"></i>
+                                                مشاوره
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- عملیات -->
+                                    <td class="no-print">
+                                        <div class="ml-actions">
+                                            <a href="{% url 'meeting_pdf' meeting.id %}"
+                                            target="_blank"
+                                            class="ml-action ml-action-pdf"
+                                            title="دانلود PDF">
+                                                <i class="fa fa-file-pdf-o"></i>
+                                            </a>
+
+                                            <a href="{% url 'edit_request_meeting' meeting.id %}"
+                                            class="ml-action ml-action-edit"
+                                            title="ویرایش">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+
+                                            {% if meeting.related_movakel %}
+                                                <a href="{% url 'movakel-detail' meeting.related_movakel.slug %}"
+                                                class="ml-action ml-action-view"
+                                                title="مشاهده پرونده">
+                                                    <i class="fa fa-folder-open"></i>
+                                                </a>
+                                            {% elif meeting.status != 'converted' %}
+                                                <a href="{% url 'convert_meeting_to_movakel' meeting.id %}"
+                                                class="ml-action ml-action-convert"
+                                                title="تبدیل به وکالت"
+                                                onclick="return confirm('آیا مطمئن هستید که این ملاقات به پرونده وکالت تبدیل شود؟');">
+                                                    <i class="fa fa-exchange"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="ml-empty">
+                    <div class="ml-empty-icon">
+                        <i class="fa fa-calendar-o"></i>
+                    </div>
+                    <h3>هیچ ملاقاتی ثبت نشده است</h3>
+                    <p>برای شروع، اولین ملاقات خود را ثبت کنید</p>
+                    <a href="{% url 'request_meeting' %}" class="ml-btn-new">
+                        <i class="fa fa-plus"></i>
+                        <span>ثبت ملاقات جدید</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ===== راهنما ===== -->
+        <div class="ml-info-box">
+            <div class="ml-info-icon">
+                <i class="fa fa-lightbulb-o"></i>
+            </div>
+            <div class="ml-info-content">
+                <strong>راهنما:</strong>
+                از دکمه <i class="fa fa-exchange"></i> می‌توانید ملاقات را به پرونده وکالت تبدیل کنید.
+                پس از تبدیل، وضعیت از «مشاوره» به «وکالت» تغییر می‌کند.
             </div>
         </div>
 

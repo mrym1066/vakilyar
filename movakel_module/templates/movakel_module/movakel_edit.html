@@ -3,42 +3,327 @@
 
 {% block title %}ویرایش پرونده{% endblock %}
 
-{% block content %}
-<section class="py-4" dir="rtl">
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="page-breadcrumb no-print">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">ویرایش پرونده: {{ movakel.name }}</h5>
-                    </div>
-                    <div class="card-body">
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert {{ message.tags }}">{{ message }}</div>
-                            {% endfor %}
-                        {% endif %}
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'movakel-list' %}">
+                    <i class="fa fa-folder-open"></i>
+                    <span>پرونده‌ها</span>
+                </a>
+            </li>
+            {% if movakel %}
+                <li>
+                    <a href="{% url 'movakel-detail' movakel.slug %}">
+                        <i class="fa fa-user"></i>
+                        <span>{{ movakel.name|truncatechars:20 }}</span>
+                    </a>
+                </li>
+            {% endif %}
+            <li class="active">
+                <i class="fa fa-pencil"></i>
+                <span>ویرایش پرونده</span>
+            </li>
+        </ol>
+        <button type="button" class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-right"></i>
+            <span>بازگشت</span>
+        </button>
+    </div>
+</nav>
+{% endblock %}
 
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {% for field in form %}
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">{{ field.label }}</label>
-                                    {{ field|add_class:"form-control" }}
-                                    {% if field.errors %}
-                                        <div class="text-danger small mt-1">{{ field.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                            <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary">💾 ذخیره تغییرات</button>
-                                <a href="{{ movakel.get_absolute_url }}" class="btn btn-secondary">انصراف</a>
-                            </div>
-                        </form>
+{% block content %}
+<section class="edit-movakel-section">
+    <div class="container">
+
+        <!-- ═══ هدر صفحه ═══ -->
+        <div class="edit-movakel-header">
+            <div class="edit-movakel-header-top">
+                <div class="edit-movakel-header-info">
+                    <div class="edit-movakel-header-icon">
+                        <i class="fa fa-pencil-square-o"></i>
                     </div>
+                    <div>
+                        <h1 class="edit-movakel-title">ویرایش اطلاعات پرونده</h1>
+                        <p class="edit-movakel-subtitle">
+                            {% if movakel %}
+                                <i class="fa fa-user"></i>
+                                <strong>{{ movakel.name }}</strong>
+                                {% if movakel.mobile_number %}
+                                    <span class="divider">|</span>
+                                    <i class="fa fa-phone"></i>
+                                    <span dir="ltr">{{ movakel.mobile_number }}</span>
+                                {% endif %}
+                            {% else %}
+                                اطلاعات پرونده را ویرایش کنید
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="edit-movakel-header-actions no-print">
+                    {% if movakel %}
+                        <a href="{% url 'movakel-detail' movakel.slug %}" class="btn-edit-view">
+                            <i class="fa fa-eye"></i>
+                            <span>مشاهده پرونده</span>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-custom alert-custom-{{ message.tags }}">
+                    <i class="fa fa-info-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- ═══ فرم ═══ -->
+        <form method="POST" enctype="multipart/form-data" class="edit-movakel-form" novalidate>
+            {% csrf_token %}
+
+            <div class="row">
+                <!-- ستون اصلی -->
+                <div class="col-md-8 col-sm-12">
+
+                    <div class="edit-section-card">
+                        <div class="edit-section-header">
+                            <div class="edit-section-icon edit-icon-navy">
+                                <i class="fa fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <h3>اطلاعات هویتی</h3>
+                                <p>نام و اطلاعات شناسایی موکل</p>
+                            </div>
+                        </div>
+                        <div class="edit-section-body">
+                            <div class="row">
+                                {% for field in form %}
+                                    {% if field.name == 'name' or field.name == 'national_id' or field.name == 'age' or field.name == 'mobile_number' or field.name == 'phone_number' or field.name == 'mechanized_number' %}
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="edit-field">
+                                                <label for="{{ field.id_for_label }}">
+                                                    <i class="fa fa-circle-o"></i>
+                                                    {{ field.label }}
+                                                    {% if field.field.required %}<span class="required">*</span>{% endif %}
+                                                </label>
+                                                {{ field|add_class:"form-control" }}
+                                                {% if field.errors %}
+                                                    <div class="field-error">
+                                                        <i class="fa fa-exclamation-triangle"></i>
+                                                        {{ field.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edit-section-card">
+                        <div class="edit-section-header">
+                            <div class="edit-section-icon edit-icon-gold">
+                                <i class="fa fa-folder-open"></i>
+                            </div>
+                            <div>
+                                <h3>اطلاعات پرونده</h3>
+                                <p>توضیحات و جزئیات پرونده</p>
+                            </div>
+                        </div>
+                        <div class="edit-section-body">
+                            <div class="row">
+                                {% for field in form %}
+                                    {% if field.name == 'introduction' or field.name == 'category' or field.name == 'description' or field.name == 'notes' %}
+                                        <div class="col-md-{% if field.name == 'description' or field.name == 'notes' %}12{% else %}6{% endif %} col-sm-12">
+                                            <div class="edit-field">
+                                                <label for="{{ field.id_for_label }}">
+                                                    <i class="fa fa-file-text-o"></i>
+                                                    {{ field.label }}
+                                                </label>
+                                                {{ field|add_class:"form-control" }}
+                                                {% if field.errors %}
+                                                    <div class="field-error">
+                                                        <i class="fa fa-exclamation-triangle"></i>
+                                                        {{ field.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edit-section-card">
+                        <div class="edit-section-header">
+                            <div class="edit-section-icon edit-icon-success">
+                                <i class="fa fa-money"></i>
+                            </div>
+                            <div>
+                                <h3>اطلاعات مالی</h3>
+                                <p>مبلغ حق‌الوکاله و نحوه پرداخت</p>
+                            </div>
+                        </div>
+                        <div class="edit-section-body">
+                            <div class="row">
+                                {% for field in form %}
+                                    {% if field.name == 'total_amount' or field.name == 'payment_method' %}
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="edit-field">
+                                                <label for="{{ field.id_for_label }}">
+                                                    <i class="fa fa-credit-card"></i>
+                                                    {{ field.label }}
+                                                </label>
+                                                {{ field|add_class:"form-control" }}
+                                                {% if field.errors %}
+                                                    <div class="field-error">
+                                                        <i class="fa fa-exclamation-triangle"></i>
+                                                        {{ field.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ستون کنار -->
+                <div class="col-md-4 col-sm-12">
+
+                    <div class="edit-side-card">
+                        <div class="edit-side-card-header">
+                            <i class="fa fa-image"></i>
+                            <h4>تصویر پرونده</h4>
+                        </div>
+                        <div class="edit-side-card-body">
+                            {% if movakel.image %}
+                                <div class="current-image-preview">
+                                    <img src="{{ movakel.image.url }}" alt="{{ movakel.name }}">
+                                </div>
+                            {% else %}
+                                <div class="no-image-preview">
+                                    <i class="fa fa-user-o"></i>
+                                    <span>تصویری ثبت نشده</span>
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% if field.name == 'image' %}
+                                    <div class="edit-file-upload">
+                                        <label for="{{ field.id_for_label }}" class="file-upload-label">
+                                            <i class="fa fa-cloud-upload"></i>
+                                            <span>انتخاب تصویر جدید</span>
+                                        </label>
+                                        {{ field|add_class:"file-input" }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="edit-side-card">
+                        <div class="edit-side-card-header">
+                            <i class="fa fa-flag"></i>
+                            <h4>وضعیت پرونده</h4>
+                        </div>
+                        <div class="edit-side-card-body">
+                            {% for field in form %}
+                                {% if field.name == 'case_status' %}
+                                    <div class="edit-field">
+                                        <label for="{{ field.id_for_label }}">
+                                            <i class="fa fa-circle-o"></i>
+                                            {{ field.label }}
+                                        </label>
+                                        {{ field|add_class:"form-control" }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% for field in form %}
+                                {% if field.field.widget.input_type == 'checkbox' %}
+                                    <div class="edit-checkbox-wrapper">
+                                        <label class="edit-checkbox">
+                                            {{ field }}
+                                            <span class="edit-checkbox-label">{{ field.label }}</span>
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- فیلدهای باقی‌مانده -->
+            <div class="edit-movakel-remaining-fields">
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--navy); margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--gray-200);">
+                    <i class="fa fa-list-alt" style="color: var(--gold);"></i>
+                    سایر اطلاعات
+                </h3>
+                <div class="row">
+                    {% for field in form %}
+                        {% if field.name != 'name' and field.name != 'national_id' and field.name != 'age' and field.name != 'mobile_number' and field.name != 'phone_number' and field.name != 'mechanized_number' and field.name != 'introduction' and field.name != 'category' and field.name != 'description' and field.name != 'notes' and field.name != 'total_amount' and field.name != 'payment_method' and field.name != 'image' and field.name != 'case_status' and field.field.widget.input_type != 'checkbox' %}
+                            <div class="col-md-6 col-sm-6">
+                                <div class="edit-field">
+                                    <label for="{{ field.id_for_label }}">
+                                        <i class="fa fa-circle-o"></i>
+                                        {{ field.label }}
+                                        {% if field.field.required %}<span class="required">*</span>{% endif %}
+                                    </label>
+                                    {{ field|add_class:"form-control" }}
+                                    {% if field.errors %}
+                                        <div class="field-error">
+                                            <i class="fa fa-exclamation-triangle"></i>
+                                            {{ field.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- دکمه‌ها -->
+            <div class="edit-movakel-actions">
+                <button type="submit" class="btn-edit-save">
+                    <i class="fa fa-save"></i>
+                    <span>ذخیره تغییرات</span>
+                </button>
+                {% if movakel %}
+                    <a href="{% url 'movakel-detail' movakel.slug %}" class="btn-edit-cancel">
+                        <i class="fa fa-times"></i>
+                        <span>انصراف</span>
+                    </a>
+                {% else %}
+                    <button type="button" class="btn-edit-cancel" onclick="history.back()">
+                        <i class="fa fa-times"></i>
+                        <span>انصراف</span>
+                    </button>
+                {% endif %}
+            </div>
+
+        </form>
+
     </div>
 </section>
 {% endblock %}

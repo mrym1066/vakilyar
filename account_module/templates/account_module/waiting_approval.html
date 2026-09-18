@@ -1,24 +1,46 @@
-{% extends 'base.html' %}
+{% extends 'shared/_layout.html' %}
 
 {% block title %}در انتظار تأیید{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card text-center mb-4">
-                <div class="card-body py-5">
-                    <i class="fas fa-hourglass-half fa-4x text-warning mb-3"></i>
-                    <h3 class="card-title">در انتظار تأیید مدیر</h3>
-                    <p class="card-text text-muted">
-                        حساب کاربری شما با موفقیت ثبت شد.<br>
-                        پس از تأیید توسط مدیر سیستم، می‌توانید وارد پنل کاربری شوید.
-                    </p>
-                    <a href="{% url 'logout_page' %}" class="btn btn-outline-secondary mt-2">خروج</a>
-                    <a href="/articles/" class="btn btn-primary mt-2">مشاهده مقالات</a>
+<section class="auth-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                <div class="auth-card status-card">
+                    <div class="auth-header">
+                        <i class="fa fa-hourglass-half fa-5x text-warning"></i>
+                        <h2>در انتظار تأیید مدیر</h2>
+                    </div>
+
+                    <div class="status-body">
+                        <p class="text-success">
+                            <i class="fa fa-check-circle"></i>
+                            حساب کاربری شما با موفقیت ثبت شد.
+                        </p>
+                        <p class="text-muted">
+                            پس از تأیید توسط مدیر سیستم، می‌توانید وارد پنل کاربری شوید.
+                            این فرآیند معمولاً کمتر از ۲۴ ساعت طول می‌کشد.
+                        </p>
+                    </div>
+
+                    <div class="status-actions">
+                        <form method="post" action="{% url 'logout_page' %}" class="d-inline-block">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="fa fa-sign-out"></i>
+                                خروج از حساب
+                            </button>
+                        </form>
+
+                        <a href="{% url 'articles_list' %}" class="btn btn-primary">
+                            <i class="fa fa-newspaper-o"></i>
+                            مشاهده مقالات
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
